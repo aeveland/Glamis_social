@@ -66,7 +66,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - Brand: Glamis Guide, `blogId` **7334820**, Instagram `glamisguide`, timezone America/Los_Angeles.
 - Create each piece with `createScheduledPostForReview` (reviewers: `aeveland@me.com`, approvalSystem `any`). If that tool errors because the plan has no team review, fall back to `createScheduledPost` with `"draft": true`, and tell Andy the drafts need scheduling in Metricool.
 - Story 1: `instagramData.type: "STORY"`, media = video URL, 10:00, `autoPublish: true`, no text.
-- Story 2: `instagramData.type: "STORY"`, media = story-download.png URL, 10:00 (or 10:01 so it follows Story 1), `autoPublish: false`, which sends a phone notification so Andy can add the link sticker. Put the `ig_story` campaign link in `hasNotReadNotes`/notes if available, otherwise in the build report.
+- Story 2: `instagramData.type: "STORY"`, media = story-download.png URL, 10:00 (or 10:01 so it follows Story 1), `autoPublish: false`, which sends a phone notification so Andy can add the link sticker. Put the `ig_story` campaign link in the build report so Andy can copy it.
 - Post: `instagramData.type: "POST"`, media = post.png URL, caption as `text`, 17:00, `autoPublish: true`.
 - Always include `"instagramData"` and `"providers":[{"network":"instagram"}]`.
 
