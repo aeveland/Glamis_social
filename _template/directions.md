@@ -1,24 +1,24 @@
 status: draft
-# ↑ Change to "ready" and save once video.mp4 and screenshot.png are in this folder.
-#   Saving with "ready" commits and pushes this folder automatically.
 
 feature:
-# Name of the feature in the video. Example: Landmark Details
-
 what it does:
-# One sentence. Example: Tap any landmark for photo, elevation, coordinates, directions.
-
 key facts:
-# Real facts only, used verbatim in copy. Example: Works offline. 40+ named landmarks.
-
 angle:
-# Optional. Who this is for or why it matters. Example: First-timers who do not know the names.
-
 headline:
-# Optional. Leave blank and Claude drafts one.
-
 device:
-# Optional: iphone | ipad | watch. Blank = picked from the screenshot size.
-
 notes:
-# Optional. Anything else for this day.
+
+# ─────────────────────────────────────────────────────────────
+# HOW TO FILL THIS IN
+# Type each answer on the SAME line, right after the colon.
+# Lines starting with # (like these) are ignored.
+#
+# status       draft or ready. Saving with "ready" publishes this folder.
+# feature      Name of the feature in the video.
+# what it does One sentence.
+# key facts    Real facts only. Used word for word. Blank is fine.
+# angle        Optional. Who it is for or why it matters.
+# headline     Optional. Blank = Claude drafts one.
+# device       Optional: iphone, ipad or watch. Blank = picked from screenshot.
+# notes        Optional. Anything else for this day.
+# ─────────────────────────────────────────────────────────────
