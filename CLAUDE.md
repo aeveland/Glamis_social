@@ -72,8 +72,8 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 
 ## Campaign links (App Store Connect)
 
-- `ig_story`: TODO, paste link
-- `ig_bio`: TODO, paste link (this is the Instagram profile link)
+- `ig_story`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_story&mt=8
+- `ig_bio`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_bio&mt=8 (the Instagram profile link)
 
 ## Media hosting
 
