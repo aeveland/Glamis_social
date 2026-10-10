@@ -1,0 +1,79 @@
+# Glamis Social
+
+Daily Instagram content for **Glamis Guide** (@glamisguide), a free iOS map app for the Imperial Sand Dunes. Site: glamisguide.app. Owner: Andy.
+
+## Daily deliverables
+
+| Time (PT) | Type | Asset | Publishing |
+|---|---|---|---|
+| 10:00 AM | Story 1 | `<day>/video.mp4`, the feature demo (hand + voiceover) | Auto-publish |
+| 10:00 AM | Story 2 | `<day>/out/story-download.png` | Phone notification. Andy adds the link sticker by hand |
+| 5:00 PM | Feed post | `<day>/out/post.png` + caption | Auto-publish |
+
+Everything goes into Metricool **as drafts for review** (`createScheduledPostForReview`). Andy approves each evening. Never publish directly.
+
+## Folder layout
+
+- `brand/`: fixed assets. Do not edit without Andy.
+- `_template/directions.md`: copied into each new day.
+- `YYYY-MM-DD/`: one per posting day. Holds `video.mp4`, `screenshot.png`, `directions.md` (Andy), plus `copy.json` and `out/` (Claude).
+- `_example/`: reference render only. Never schedule it.
+- `tools/render.py`: the only way graphics get made. Layouts live in code so the series stays consistent.
+
+## Building a day
+
+A day is buildable when `directions.md` has `status: ready` and the folder holds a video and a screenshot.
+
+1. Read `directions.md`. Look at `screenshot.png` and a frame of the video to confirm the feature.
+2. Write `<day>/copy.json`:
+   ```json
+   {
+     "story_headline": "Know every hill by name.",
+     "post_headline": "Every landmark, one tap away.",
+     "post_subline": "Elevation, coordinates, directions. Oldsmobile Hill to Glamis Flats.",
+     "caption": "…",
+     "story1_caption": ""
+   }
+   ```
+3. Run `python3 tools/render.py <day>`. Open both PNGs and check them: no overflow, headline at most 3 lines, the screenshot reads clearly.
+4. Commit `copy.json` + `out/` with the message `Build: <day> — <feature>`, then push.
+5. Create the three Metricool drafts (see below). Report back with the images and the copy.
+
+If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`. Use `post_headline` only if it fits that pattern.
+
+## Copy rules
+
+- **Headlines:** 3–6 words. Sentence case. End with a period. Benefit first, about the rider and not the app. Examples: "Never lose camp again." / "The dunes, in your pocket." / "Know every hill by name."
+- **Post subline:** two short sentences. Plain facts that explain the headline. Example: "NAIP imagery stored on your phone. Zero bars required."
+- **Caption:** 2–4 short lines. Say what it does, why it matters out there, then "Free on the App Store. Link in bio." Up to 5 hashtags from: #glamis #glamisdunes #imperialsanddunes #duning #sxs #utv #offroad #sanddunes.
+- Use only facts from `directions.md` or the screenshot. Never invent numbers, landmark counts, or features. If a fact is missing, write around it.
+- Speak to dune riders: camp, the flats, Oldsmobile, Competition Hill, holiday weekends. No travel-brochure tone.
+
+## Device frame
+
+`render.py` picks the device from the screenshot dimensions. A `device:` line in `directions.md` overrides it.
+- Narrow portrait (width/height < 0.6) → `iphone` (hand holding iPhone)
+- Small and near-square (under 1000 px, ratio 0.7–1.0) → `watch` (watch on wrist)
+- Anything else → `ipad` (two hands, landscape). iPad screenshots should be taken in landscape.
+
+## Instagram specs
+
+- Story: 1080×1920. Keep text out of the top 250 px and bottom 250 px.
+- Feed post: 1080×1350 (4:5).
+
+## Metricool
+
+- Brand: Glamis Guide (Instagram `glamisguide`). Timezone America/Los_Angeles.
+- Story 1: video, 10:00, auto-publish.
+- Story 2: story-download.png, 10:00, **notification/manual publish** (the API cannot add stickers). Put the `ig_story` campaign link in the note so Andy can copy it.
+- Post: post.png + caption, 17:00, auto-publish.
+- Media URL: see "Media hosting" below.
+
+## Campaign links (App Store Connect)
+
+- `ig_story`: TODO, paste link
+- `ig_bio`: TODO, paste link (this is the Instagram profile link)
+
+## Media hosting
+
+TODO: decide public repo vs private repo + separate public host. Metricool needs a public URL for every file.

@@ -1,0 +1,10 @@
+{
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "/\\d{4}-\\d{2}-\\d{2}/directions\\.md$",
+        "cmd": "bash \"${workspaceFolder}/tools/publish.sh\" \"${file}\""
+      }
+    ]
+  }
+}
