@@ -140,30 +140,66 @@ def render_story(copy, out):
         sd.line([(0, y), (STORY[0], y)], fill=(40, 20, 0, a))
     c.alpha_composite(shade)
 
-    icon = Image.open(BRAND / "app-icon.png").convert("RGBA").resize((300, 300), Image.LANCZOS)
-    ish = Image.new("RGBA", STORY, (0, 0, 0, 0))
-    ish.paste((0, 0, 0, 90), (390, 438, 690, 738), icon.split()[3])
-    c.alpha_composite(ish.filter(ImageFilter.GaussianBlur(18)))
-    c.alpha_composite(icon, (390, 420))
-
     d = ImageDraw.Draw(c)
-    text_block(c, ["Glamis Guide"], font("InterDisplay-SemiBold.otf", 64), 540, 755, 70, shadow=0.45)
+
+    def ink(fnt, text="Hg"):
+        """Top offset and height of the visible glyphs, for tight spacing."""
+        b = d.textbbox((0, 0), text, font=fnt)
+        return b[1], b[3] - b[1]
+
+    # Vertical stack, top to bottom. Gaps are the visible space between elements.
+    y = 560                      # icon top (below the 250 px safe zone)
+    ICON = 220
+    GAP_ICON_TITLE = 32          # icon and app name read as one unit
+    GAP_TITLE_HEAD = 84
+    GAP_HEAD_SUB = 56
+    GAP_SUB_BADGE = 36
+    GAP_BADGE_URL = 44
+
+    icon = Image.open(BRAND / "app-icon.png").convert("RGBA")
+    solid = icon.split()[3].point(lambda v: 255 if v > 200 else 0).getbbox()
+    icon = icon.crop(solid).resize((ICON, ICON), Image.LANCZOS)  # trim baked-in shadow + padding
+    ix = (STORY[0] - ICON) // 2
+    ish = Image.new("RGBA", STORY, (0, 0, 0, 0))
+    ish.paste((0, 0, 0, 90), (ix, y + 16, ix + ICON, y + 16 + ICON), icon.split()[3])
+    c.alpha_composite(ish.filter(ImageFilter.GaussianBlur(18)))
+    c.alpha_composite(icon, (ix, y))
+    y += ICON + GAP_ICON_TITLE
+
+    tf = font("InterDisplay-SemiBold.otf", 60)
+    off, h = ink(tf, "Glamis Guide")
+    text_block(c, ["Glamis Guide"], tf, 540, y - off, 70, shadow=0.45)
+    y += h + GAP_TITLE_HEAD
 
     hf = font("InterDisplay-Bold.otf", 132)
     lines = wrap(d, copy["story_headline"], hf, 960)
-    text_block(c, lines, hf, 540, 940, 138, shadow=0.5)
+    off, _ = ink(hf, "H")
+    lh = 140
+    text_block(c, lines, hf, 540, y - off, lh, shadow=0.5)
+    last_off, last_h = ink(hf, lines[-1])
+    y += lh * (len(lines) - 1) + (last_off + last_h - off) + GAP_HEAD_SUB
 
-    text_block(c, ["Free. No account. No ads."], font("Inter-Medium.otf", 46), 540, 1300, 56, shadow=0.55)
+    sf = font("Inter-Medium.otf", 46)
+    sub = "Free. No account. No ads."
+    off, h = ink(sf, sub)
+    text_block(c, [sub], sf, 540, y - off, 56, shadow=0.55)
+    y += h + GAP_SUB_BADGE
 
     badge = Image.open(BRAND / "app-store-badge-cutout.png").convert("RGBA")
-    bw = 500
+    bw = 480
     badge = badge.resize((bw, round(badge.height * bw / badge.width)), Image.LANCZOS)
-    c.alpha_composite(badge, ((STORY[0] - bw) // 2, 1395))
+    c.alpha_composite(badge, ((STORY[0] - bw) // 2, y))
+    y += badge.height + GAP_BADGE_URL
 
-    uf = font("Inter-Medium.otf", 44)
-    y = text_block(c, ["glamisguide.app"], uf, 540, 1600, 50, shadow=0.55)
-    w = d.textlength("glamisguide.app", font=uf)
-    d.line([(540 - w / 2, 1656), (540 + w / 2, 1656)], fill=WHITE, width=3)
+    uf = font("Inter-Medium.otf", 42)
+    url = "glamisguide.app"
+    off, h = ink(uf, url)
+    text_block(c, [url], uf, 540, y - off, 50, shadow=0.55)
+    w = d.textlength(url, font=uf)
+    uy = y + h + 8
+    d.line([(540 - w / 2, uy), (540 + w / 2, uy)], fill=WHITE, width=3)
+    if uy > STORY[1] - 250:
+        print(f"warning: story content ends at {uy}px, inside the bottom safe zone")
 
     c.convert("RGB").save(out, quality=95)
 
