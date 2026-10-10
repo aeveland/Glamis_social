@@ -56,6 +56,10 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - Small and near-square (under 1000 px, ratio 0.7–1.0) → `watch` (watch on wrist)
 - Anything else → `ipad` (two hands, landscape). iPad screenshots should be taken in landscape.
 
+## Approved layouts
+
+- Download Story: approved 2026-10-10 (`2026-10-11/out/story-download.png` is the reference). Icon and app name grouped tight, the whole stack pinned to the bottom with 200 px of padding. Do not change the layout in `render.py` without Andy's sign-off.
+
 ## Instagram specs
 
 - Story: 1080×1920. Keep text out of the top 250 px and bottom 250 px.
