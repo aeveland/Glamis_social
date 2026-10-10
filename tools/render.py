@@ -140,6 +140,8 @@ def render_story(copy, out):
         sd.line([(0, y), (STORY[0], y)], fill=(40, 20, 0, a))
     c.alpha_composite(shade)
 
+    base = c
+    c = Image.new("RGBA", STORY, (0, 0, 0, 0))  # stack is drawn here, then pinned to the bottom
     d = ImageDraw.Draw(c)
 
     def ink(fnt, text="Hg"):
@@ -148,7 +150,7 @@ def render_story(copy, out):
         return b[1], b[3] - b[1]
 
     # Vertical stack, top to bottom. Gaps are the visible space between elements.
-    y = 560                      # icon top (below the 250 px safe zone)
+    y = 0                        # stack starts at 0; it is shifted down at the end
     ICON = 220
     GAP_ICON_TITLE = 32          # icon and app name read as one unit
     GAP_TITLE_HEAD = 84
@@ -198,8 +200,11 @@ def render_story(copy, out):
     w = d.textlength(url, font=uf)
     uy = y + h + 8
     d.line([(540 - w / 2, uy), (540 + w / 2, uy)], fill=WHITE, width=3)
-    if uy > STORY[1] - 250:
-        print(f"warning: story content ends at {uy}px, inside the bottom safe zone")
+    # Pin the stack: its last line sits BOTTOM_PAD above the bottom edge.
+    BOTTOM_PAD = 200             # bottom padding; Instagram reply bar covers roughly the last 150-200 px
+    shift = STORY[1] - BOTTOM_PAD - uy
+    base.alpha_composite(c, (0, shift))
+    c = base
 
     c.convert("RGB").save(out, quality=95)
 
