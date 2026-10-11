@@ -71,7 +71,6 @@ struct DropZone: View {
     let types: [UTType]
     let isImage: Bool
     @Binding var url: URL?
-    @State private var targeted = false
 
     var body: some View {
         VStack(spacing: 8) {
@@ -93,11 +92,11 @@ struct DropZone: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [6]))
-                .foregroundColor(targeted ? Color.accentColor : Color.secondary.opacity(0.5))
+                .foregroundColor(Color.secondary.opacity(0.5))
         )
         .contentShape(Rectangle())
         .onTapGesture { choose() }
-        .onDrop(of: [UTType.fileURL], isTargeted: $targeted) { providers in
+        .onDrop(of: [UTType.fileURL], isTargeted: nil) { providers in
             guard let provider = providers.first else { return false }
             provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
                 var dropped: URL?
