@@ -42,6 +42,6 @@ if git diff --cached --quiet; then
   exit 0
 fi
 git commit -q -m "Ready: $DAY — $FEATURE"
-git pull -q --rebase
+git pull -q --rebase --autostash
 git push -q
 notify "$DAY published: $FEATURE"
