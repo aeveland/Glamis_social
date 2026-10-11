@@ -22,7 +22,7 @@ Everything goes into Metricool **as drafts for review** (`createScheduledPostFor
 - `brand/`: fixed assets. Do not edit without Andy.
 - `_template/directions.md`: copied into each new day.
 - `YYYY-MM-DD/`: one per posting day. Holds `video.mp4`, `screenshot.png`, `directions.md` (Andy), plus `copy.json` and `out/` (Claude).
-- `_example/`: reference render only. Never schedule it.
+- `2026-10-11/`: test day and the approved reference (never posted). Never schedule it.
 - `tools/render.py`: the only way graphics get made. Layouts live in code so the series stays consistent.
 
 ## Building a day
