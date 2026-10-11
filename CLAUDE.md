@@ -1,6 +1,6 @@
 # Glamis Social
 
-Daily Instagram content for **Glamis Guide** (@glamisguide), a free iOS map app for the Imperial Sand Dunes. Site: glamisguide.app. Owner: Andy.
+Daily Instagram (@glamisguide) and Facebook Page content for **Glamis Guide**, a free iOS map app for the Imperial Sand Dunes. Site: glamisguide.app. Owner: Andy.
 
 ## Daily deliverables
 
@@ -12,6 +12,10 @@ Posting started Mon 2026-10-12.
 | 10:01 AM | Story 2 | `<day>/out/story-download.png` | Phone notification. Andy adds the link sticker by hand | Every day |
 | 12:00 PM | Reel | Same `<day>/video.*` + `reel_caption` | Auto-publish | Every day |
 | 5:00 PM | Feed post | `<day>/out/post.png` + `caption` | Auto-publish | **Tue, Thu, Sat only**, plus every day in a ramp-up window |
+| 12:00 PM | Facebook Reel | Same `<day>/video.*` + `fb_reel_caption` | Auto-publish | Every day |
+| 5:00 PM | Facebook post | `<day>/out/post.png` + `fb_caption` | Auto-publish | Same days as the Instagram feed post |
+
+Facebook goes to the Glamis Guide **Page**. Facebook Groups cannot be scheduled by any tool (Meta removed Groups API access), so never try to post to the group.
 
 Ramp-up windows (feed post daily): Halloween Oct 24–Nov 1 2026, Thanksgiving Nov 19–29 2026, New Year's Dec 26 2026–Jan 3 2027, Presidents' Day Feb 6–15 2027. The same list is in `tools/nudge.py`. Keep both in sync.
 
@@ -37,12 +41,14 @@ A day is buildable when `directions.md` has `status: ready` and the folder holds
      "post_headline": "Every landmark, one tap away.",
      "post_subline": "Elevation, coordinates, directions. Oldsmobile Hill to Glamis Flats.",
      "caption": "…  (feed post, only used on feed days)",
-     "reel_caption": "…  (every day)"
+     "reel_caption": "…  (every day)",
+     "fb_reel_caption": "…  (every day, Facebook Reel)",
+     "fb_caption": "…  (feed days only, Facebook post)"
    }
    ```
 3. Run `python3 tools/render.py <day>`. Open both PNGs and check them: no overflow, headline at most 3 lines, the screenshot reads clearly.
 4. Commit `copy.json` + `out/` with the message `Build: <day> — <feature>`, then push.
-5. Create that day's Metricool items (see below): 3 on normal days, 4 on feed days. Report back with the images and the copy.
+5. Create that day's Metricool items (see below): 4 on normal days (3 Instagram + 1 Facebook), 6 on feed days (4 Instagram + 2 Facebook). Report back with the images and the copy.
 
 If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`. Use `post_headline` only if it fits that pattern.
 
@@ -52,6 +58,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - **Post subline:** two short sentences. Plain facts that explain the headline. Example: "NAIP imagery stored on your phone. Zero bars required."
 - **Reel caption:** 1–2 short lines plus "Free on the App Store. Link in bio." and up to 5 hashtags. Different wording from the feed caption.
 - **Caption:** 2–4 short lines. Say what it does, why it matters out there, then "Free on the App Store. Link in bio." Up to 5 hashtags from: #glamis #glamisdunes #imperialsanddunes #duning #sxs #utv #offroad #sanddunes.
+- **Facebook captions** (`fb_reel_caption`, `fb_caption`): start from the matching Instagram caption (`reel_caption`, `caption`). Replace "Free on the App Store. Link in bio." with "Free on the App Store: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_fb&mt=8". Facebook links are clickable, so the link goes in the caption. Keep at most 3 hashtags.
 - Use only facts from `directions.md` or the screenshot. Never invent numbers, landmark counts, or features. If a fact is missing, write around it.
 - Speak to dune riders: camp, the flats, Oldsmobile, Competition Hill, holiday weekends. No travel-brochure tone.
 
@@ -80,11 +87,15 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - Reel: `instagramData.type: "REEL"`, `showReelOnFeed: true`, media = video URL, `reel_caption` as `text`, 12:00, `autoPublish: true`.
 - Post (feed days only): `instagramData.type: "POST"`, media = post.png URL, `caption` as `text`, 17:00, `autoPublish: true`.
 - Media URLs: use the commit hash instead of `main` (`.../Glamis_social/<sha>/<day>/...`) so Metricool never gets a stale cached copy.
-- Always include `"instagramData"` and `"providers":[{"network":"instagram"}]`.
+- Always include `"instagramData"` and `"providers":[{"network":"instagram"}]` on Instagram items.
+- Facebook Page is connected to the same brand (Page id 1449931404851665). Create Facebook items as **separate** posts, never combined with Instagram, because the captions differ. Use `"providers":[{"network":"facebook"}]` and include `"facebookData"`.
+- Facebook Reel: `facebookData.type: "REEL"`, media = video URL, `fb_reel_caption` as `text`, 12:00, `autoPublish: true`.
+- Facebook post (feed days only): `facebookData.type: "POST"`, media = post.png URL, `fb_caption` as `text`, 17:00, `autoPublish: true`.
 
 ## Campaign links (App Store Connect)
 
 - `ig_story`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_story&mt=8
+- `glamisguide_fb`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_fb&mt=8 (Facebook captions)
 - `ig_bio`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_bio&mt=8 (the Instagram profile link)
 
 ## Media hosting
