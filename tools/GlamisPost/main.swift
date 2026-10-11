@@ -172,7 +172,7 @@ struct ContentView: View {
                 if busy { ProgressView().controlSize(.small) }
                 Text(message)
                     .font(.callout)
-                    .foregroundStyle(success ? .green : .secondary)
+                    .foregroundStyle(success ? Color.green : Color.secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer()
                 if success {
@@ -203,14 +203,14 @@ struct ContentView: View {
     func publish() {
         guard let video, let screenshot else { return }
         let day = dayString(date)
-        let feature = oneLine(feature), what = oneLine(whatItDoes), facts = oneLine(keyFacts)
+        let featureText = oneLine(feature), what = oneLine(whatItDoes), facts = oneLine(keyFacts)
         busy = true
         success = false
         message = "Saving…"
 
         DispatchQueue.global(qos: .userInitiated).async {
             let result = Self.writeAndPush(day: day, video: video, screenshot: screenshot,
-                                           feature: feature, what: what, facts: facts)
+                                           feature: featureText, what: what, facts: facts)
             DispatchQueue.main.async {
                 busy = false
                 success = result.ok
