@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LIST = "Glamis Social"
 FEED_DAYS = {1, 3, 5}  # Tue, Thu, Sat (Mon = 0)
+START = dt.date(2026, 10, 12)  # first real posting day; no reminders before this
 
 # Ramp-up windows: feed post every day inside these dates (inclusive).
 RAMPS = [
@@ -97,6 +98,8 @@ def pull():
 
 def add_day(day):
     """Two checkable reminders for one posting day, both due the evening before."""
+    if day < START:
+        return
     label = day.strftime("%a %b %-d")
     eve = day - dt.timedelta(days=1)
     need = missing_for(day)
