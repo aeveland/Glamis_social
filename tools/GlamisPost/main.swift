@@ -79,13 +79,13 @@ struct DropZone: View {
                 if isImage, let img = NSImage(contentsOf: url) {
                     Image(nsImage: img).resizable().scaledToFit().frame(maxHeight: 150)
                 } else {
-                    Image(systemName: "film").font(.system(size: 40)).foregroundStyle(.secondary)
+                    Image(systemName: "film").font(.system(size: 40)).foregroundColor(.secondary)
                 }
                 Text(url.lastPathComponent).font(.caption).lineLimit(1).truncationMode(.middle)
             } else {
-                Image(systemName: symbol).font(.system(size: 34)).foregroundStyle(.secondary)
+                Image(systemName: symbol).font(.system(size: 34)).foregroundColor(.secondary)
                 Text(title).font(.headline)
-                Text("Drop here or click").font(.caption).foregroundStyle(.secondary)
+                Text("Drop here or click").font(.caption).foregroundColor(.secondary)
             }
         }
         .padding(12)
@@ -93,14 +93,17 @@ struct DropZone: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [6]))
-                .foregroundStyle(targeted ? Color.accentColor : Color.secondary.opacity(0.5))
+                .foregroundColor(targeted ? Color.accentColor : Color.secondary.opacity(0.5))
         )
         .contentShape(Rectangle())
         .onTapGesture { choose() }
         .onDrop(of: [UTType.fileURL], isTargeted: $targeted) { providers in
             guard let provider = providers.first else { return false }
-            _ = provider.loadObject(ofClass: URL.self) { item, _ in
-                if let item { DispatchQueue.main.async { url = item } }
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
+                var dropped: URL?
+                if let data = item as? Data { dropped = URL(dataRepresentation: data, relativeTo: nil) }
+                else if let u = item as? URL { dropped = u }
+                if let dropped { DispatchQueue.main.async { self.url = dropped } }
             }
             return true
         }
@@ -116,16 +119,16 @@ struct DropZone: View {
 
 // MARK: - Main window
 
-struct ContentView: View {
-    @State private var date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
-    @State private var video: URL?
-    @State private var screenshot: URL?
-    @State private var feature = ""
-    @State private var whatItDoes = ""
-    @State private var keyFacts = ""
-    @State private var busy = false
-    @State private var message = ""
-    @State private var success = false
+final class PostModel: ObservableObject {
+    @Published var date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+    @Published var video: URL?
+    @Published var screenshot: URL?
+    @Published var feature = ""
+    @Published var whatItDoes = ""
+    @Published var keyFacts = ""
+    @Published var busy = false
+    @Published var message = ""
+    @Published var success = false
 
     var canPublish: Bool {
         video != nil && screenshot != nil
@@ -140,48 +143,76 @@ struct ContentView: View {
         return text.contains("status: ready") ? "This day is already published. Mark Ready replaces it." : nil
     }
 
+    func oneLine(_ s: String) -> String {
+        s.replacingOccurrences(of: "\n", with: " ").trimmingCharacters(in: .whitespaces)
+    }
+
+    func publish() {
+        guard let video = video, let screenshot = screenshot else { return }
+        let day = dayString(date)
+        let featureText = oneLine(feature)
+        let what = oneLine(whatItDoes)
+        let facts = oneLine(keyFacts)
+        busy = true
+        success = false
+        message = "Saving…"
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = ContentView.writeAndPush(day: day, video: video, screenshot: screenshot,
+                                                  feature: featureText, what: what, facts: facts)
+            DispatchQueue.main.async {
+                self.busy = false
+                self.success = result.ok
+                self.message = result.message
+            }
+        }
+    }
+}
+
+struct ContentView: View {
+    @StateObject private var m = PostModel()
+
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Glamis Post").font(.largeTitle.bold())
                 Spacer()
-                DatePicker("", selection: $date, displayedComponents: .date)
+                DatePicker("", selection: $m.date, displayedComponents: .date)
                     .labelsHidden().datePickerStyle(.field)
             }
             VStack(alignment: .leading, spacing: 4) {
-                Text(postsDescription(date)).font(.subheadline).foregroundStyle(.secondary)
-                if let note = existingNote {
-                    Text(note).font(.caption).foregroundStyle(.orange)
+                Text(postsDescription(m.date)).font(.subheadline).foregroundColor(.secondary)
+                if let note = m.existingNote {
+                    Text(note).font(.caption).foregroundColor(.orange)
                 }
             }
 
             HStack(spacing: 14) {
                 DropZone(title: "Video", symbol: "video",
-                         types: [.movie, .quickTimeMovie, .mpeg4Movie], isImage: false, url: $video)
+                         types: [.movie, .quickTimeMovie, .mpeg4Movie], isImage: false, url: $m.video)
                 DropZone(title: "Screenshot", symbol: "photo",
-                         types: [.image], isImage: true, url: $screenshot)
+                         types: [.image], isImage: true, url: $m.screenshot)
             }
 
             VStack(alignment: .leading, spacing: 10) {
-                field("Feature", "Search and Nearby Places", $feature)
-                field("What it does", "One sentence", $whatItDoes)
-                field("Key facts (optional)", "Real facts only. Used word for word.", $keyFacts)
+                field("Feature", "Search and Nearby Places", $m.feature)
+                field("What it does", "One sentence", $m.whatItDoes)
+                field("Key facts (optional)", "Real facts only. Used word for word.", $m.keyFacts)
             }
 
             HStack {
-                if busy { ProgressView().controlSize(.small) }
-                Text(message)
+                if m.busy { ProgressView().controlSize(.small) }
+                Text(m.message)
                     .font(.callout)
-                    .foregroundStyle(success ? Color.green : Color.secondary)
+                    .foregroundColor(m.success ? .green : .secondary)
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer()
-                if success {
+                if m.success {
                     Button("Done") { NSApp.terminate(nil) }
                         .keyboardShortcut(.defaultAction)
                 } else {
-                    Button("Mark Ready") { publish() }
+                    Button("Mark Ready") { m.publish() }
                         .keyboardShortcut(.defaultAction)
-                        .disabled(!canPublish)
+                        .disabled(!m.canPublish)
                 }
             }
         }
@@ -191,31 +222,8 @@ struct ContentView: View {
 
     func field(_ label: String, _ prompt: String, _ text: Binding<String>) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(label).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            Text(label).font(.caption.weight(.semibold)).foregroundColor(.secondary)
             TextField(prompt, text: text).textFieldStyle(.roundedBorder)
-        }
-    }
-
-    func oneLine(_ s: String) -> String {
-        s.replacingOccurrences(of: "\n", with: " ").trimmingCharacters(in: .whitespaces)
-    }
-
-    func publish() {
-        guard let video, let screenshot else { return }
-        let day = dayString(date)
-        let featureText = oneLine(feature), what = oneLine(whatItDoes), facts = oneLine(keyFacts)
-        busy = true
-        success = false
-        message = "Saving…"
-
-        DispatchQueue.global(qos: .userInitiated).async {
-            let result = Self.writeAndPush(day: day, video: video, screenshot: screenshot,
-                                           feature: featureText, what: what, facts: facts)
-            DispatchQueue.main.async {
-                busy = false
-                success = result.ok
-                message = result.message
-            }
         }
     }
 

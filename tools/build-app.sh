@@ -10,9 +10,22 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 echo "Compiling…"
-swiftc -O -parse-as-library \
-  -o "$APP/Contents/MacOS/GlamisPost" \
-  "$ROOT/tools/GlamisPost/main.swift"
+SDK="$(xcrun --sdk macosx --show-sdk-path)"
+LOG="$WORK/build.log"
+if ! xcrun --sdk macosx swiftc -O -parse-as-library \
+     -sdk "$SDK" -target "$(uname -m)-apple-macos13.0" \
+     -o "$APP/Contents/MacOS/GlamisPost" \
+     "$ROOT/tools/GlamisPost/main.swift" >"$LOG" 2>&1; then
+  echo
+  echo "BUILD FAILED. First errors:"
+  echo "---------------------------"
+  grep -m 8 "error:" "$LOG" || head -30 "$LOG"
+  echo "---------------------------"
+  echo "Toolchain: $(xcrun --sdk macosx swiftc --version 2>&1 | head -1)"
+  echo "SDK: $SDK"
+  rm -rf "$APP"
+  exit 1
+fi
 
 echo "Making icon…"
 ICONSET="$WORK/AppIcon.iconset"
