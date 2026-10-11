@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Add Apple Reminders when upcoming Glamis Social content is not ready.
 
-  python3 tools/nudge.py daily    # 3 PM: checks tomorrow, reminder due 5 PM today
-  python3 tools/nudge.py weekly   # Monday 8 AM: rundown of the next 7 days
+  python3 tools/nudge.py weekly   # Monday 8 AM: two reminders per day for the next 7 days
+  python3 tools/nudge.py daily    # 3 PM: makes sure tomorrow's two reminders exist
+
+Per posting day, both due the evening before:
+  "Glamis: create content for <day>"  5 PM
+  "Glamis: review drafts for <day>"   7 PM
 
 Runs on Andy's Mac via launchd (see tools/install-nudge.sh).
 Reminders go to the list "Glamis Social" and sync to iPhone through iCloud.
@@ -91,36 +95,35 @@ def pull():
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+def add_day(day):
+    """Two checkable reminders for one posting day, both due the evening before."""
+    label = day.strftime("%a %b %-d")
+    eve = day - dt.timedelta(days=1)
+    need = missing_for(day)
+    still = f"\nStill needed: {', '.join(need)}." if need else "\nFolder is ready."
+    add_reminder(
+        f"Glamis: create content for {label}",
+        f"Posts: {describe(day)}.\nAdd video, screenshot, directions.md. Set status: ready and save.{still}",
+        dt.datetime.combine(eve, dt.time(17, 0)),
+    )
+    add_reminder(
+        f"Glamis: review drafts for {label}",
+        "Metricool Planner: check the drafts and schedule them. The build runs at 5:55 PM.",
+        dt.datetime.combine(eve, dt.time(19, 0)),
+    )
+    print(f"{label}: {describe(day)}")
+
+
 def daily():
-    today = dt.date.today()
-    tomorrow = today + dt.timedelta(days=1)
-    need = missing_for(tomorrow)
-    if not need:
-        print(f"{tomorrow} ready")
-        return
-    label = tomorrow.strftime("%a %b %-d")
-    title = f"Glamis: content for {label} due 5 PM"
-    notes = f"Tomorrow: {describe(tomorrow)}.\nStill needed: {', '.join(need)}."
-    add_reminder(title, notes, dt.datetime.combine(today, dt.time(17, 0)))
-    print(title, "|", notes)
+    """Safety net: make sure tomorrow's pair exists (no duplicates are created)."""
+    add_day(dt.date.today() + dt.timedelta(days=1))
 
 
 def weekly():
+    """Create the pair for each of the next 7 posting days."""
     today = dt.date.today()
-    lines = []
-    for i in range(7):
-        day = today + dt.timedelta(days=i)
-        need = missing_for(day)
-        status = "ready" if not need else "needs " + ", ".join(need)
-        lines.append(f"{day.strftime('%a %b %-d')}: {describe(day)} — {status}")
-    upcoming = [(n, s) for n, s, e in RAMPS if s >= today]
-    if upcoming:
-        n, s = upcoming[0]
-        lines.append(f"\nNext ramp-up: {n}, starts {s.strftime('%a %b %-d')} ({(s - today).days} days).")
-    title = f"Glamis: week of {today.strftime('%b %-d')}"
-    add_reminder(title, "\n".join(lines), dt.datetime.combine(today, dt.time(9, 0)))
-    print(title)
-    print("\n".join(lines))
+    for i in range(1, 8):
+        add_day(today + dt.timedelta(days=i))
 
 
 if __name__ == "__main__":
