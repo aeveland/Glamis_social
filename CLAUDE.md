@@ -4,11 +4,16 @@ Daily Instagram content for **Glamis Guide** (@glamisguide), a free iOS map app 
 
 ## Daily deliverables
 
-| Time (PT) | Type | Asset | Publishing |
-|---|---|---|---|
-| 10:00 AM | Story 1 | `<day>/video.mp4`, the feature demo (hand + voiceover) | Auto-publish |
-| 10:00 AM | Story 2 | `<day>/out/story-download.png` | Phone notification. Andy adds the link sticker by hand |
-| 5:00 PM | Feed post | `<day>/out/post.png` + caption | Auto-publish |
+Posting started Mon 2026-10-12.
+
+| Time (PT) | Type | Asset | Publishing | Days |
+|---|---|---|---|---|
+| 10:00 AM | Story 1 | `<day>/video.*`, the feature demo (hand + voiceover) | Auto-publish | Every day |
+| 10:01 AM | Story 2 | `<day>/out/story-download.png` | Phone notification. Andy adds the link sticker by hand | Every day |
+| 12:00 PM | Reel | Same `<day>/video.*` + `reel_caption` | Auto-publish | Every day |
+| 5:00 PM | Feed post | `<day>/out/post.png` + `caption` | Auto-publish | **Tue, Thu, Sat only**, plus every day in a ramp-up window |
+
+Ramp-up windows (feed post daily): Halloween Oct 24–Nov 1 2026, Thanksgiving Nov 19–29 2026, New Year's Dec 26 2026–Jan 3 2027, Presidents' Day Feb 6–15 2027. The same list is in `tools/nudge.py`. Keep both in sync.
 
 Everything goes into Metricool **as drafts for review** (`createScheduledPostForReview`). Andy approves each evening. Never publish directly.
 
@@ -31,13 +36,13 @@ A day is buildable when `directions.md` has `status: ready` and the folder holds
      "story_headline": "Know every hill by name.",
      "post_headline": "Every landmark, one tap away.",
      "post_subline": "Elevation, coordinates, directions. Oldsmobile Hill to Glamis Flats.",
-     "caption": "…",
-     "story1_caption": ""
+     "caption": "…  (feed post, only used on feed days)",
+     "reel_caption": "…  (every day)"
    }
    ```
 3. Run `python3 tools/render.py <day>`. Open both PNGs and check them: no overflow, headline at most 3 lines, the screenshot reads clearly.
 4. Commit `copy.json` + `out/` with the message `Build: <day> — <feature>`, then push.
-5. Create the three Metricool drafts (see below). Report back with the images and the copy.
+5. Create that day's Metricool items (see below): 3 on normal days, 4 on feed days. Report back with the images and the copy.
 
 If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`. Use `post_headline` only if it fits that pattern.
 
@@ -45,6 +50,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 
 - **Headlines:** 3–6 words. Sentence case. End with a period. Benefit first, about the rider and not the app. Examples: "Never lose camp again." / "The dunes, in your pocket." / "Know every hill by name."
 - **Post subline:** two short sentences. Plain facts that explain the headline. Example: "NAIP imagery stored on your phone. Zero bars required."
+- **Reel caption:** 1–2 short lines plus "Free on the App Store. Link in bio." and up to 5 hashtags. Different wording from the feed caption.
 - **Caption:** 2–4 short lines. Say what it does, why it matters out there, then "Free on the App Store. Link in bio." Up to 5 hashtags from: #glamis #glamisdunes #imperialsanddunes #duning #sxs #utv #offroad #sanddunes.
 - Use only facts from `directions.md` or the screenshot. Never invent numbers, landmark counts, or features. If a fact is missing, write around it.
 - Speak to dune riders: camp, the flats, Oldsmobile, Competition Hill, holiday weekends. No travel-brochure tone.
@@ -71,7 +77,9 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - Create each piece with `createScheduledPostForReview` (reviewers: `aeveland@me.com`, approvalSystem `any`). If that tool errors because the plan has no team review, fall back to `createScheduledPost` with `"draft": true`, and tell Andy the drafts need scheduling in Metricool.
 - Story 1: `instagramData.type: "STORY"`, media = video URL, 10:00, `autoPublish: true`, no text.
 - Story 2: `instagramData.type: "STORY"`, media = story-download.png URL, 10:00 (or 10:01 so it follows Story 1), `autoPublish: false`, which sends a phone notification so Andy can add the link sticker. Put the `ig_story` campaign link in the build report so Andy can copy it.
-- Post: `instagramData.type: "POST"`, media = post.png URL, caption as `text`, 17:00, `autoPublish: true`.
+- Reel: `instagramData.type: "REEL"`, `showReelOnFeed: true`, media = video URL, `reel_caption` as `text`, 12:00, `autoPublish: true`.
+- Post (feed days only): `instagramData.type: "POST"`, media = post.png URL, `caption` as `text`, 17:00, `autoPublish: true`.
+- Media URLs: use the commit hash instead of `main` (`.../Glamis_social/<sha>/<day>/...`) so Metricool never gets a stale cached copy.
 - Always include `"instagramData"` and `"providers":[{"network":"instagram"}]`.
 
 ## Campaign links (App Store Connect)
