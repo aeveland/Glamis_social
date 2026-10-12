@@ -9,7 +9,7 @@ Posting started Mon 2026-10-12.
 | Time (PT) | Type | Asset | Publishing | Days |
 |---|---|---|---|---|
 | 10:00 AM | Story 1 | `<day>/video.*`, the feature demo (hand + voiceover) | Auto-publish | Every day |
-| 10:01 AM | Story 2 | `<day>/out/story-download.png` | Phone notification. Andy adds the link sticker by hand | Every day |
+| 10:01 AM | Story 2 | `<day>/out/story-download.png` | Phone notification. Andy **must** add the `ig_story` link sticker by hand (9:58 reminder) | Every day |
 | 12:00 PM | Reel | Same `<day>/video.*` + `reel_caption` | Auto-publish | Every day |
 | 5:00 PM | Feed post | `<day>/out/post.png` + `caption` | Auto-publish | **Tue, Thu, Sat only**, plus every day in a ramp-up window |
 | 12:00 PM | Facebook Reel | Same `<day>/video.*` + `fb_reel_caption` | Auto-publish | Every day |
@@ -83,7 +83,11 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - Brand: Glamis Guide, `blogId` **7334820**, Instagram `glamisguide`, timezone America/Los_Angeles.
 - Create each piece with `createScheduledPostForReview` (reviewers: `aeveland@me.com`, approvalSystem `any`). If that tool errors because the plan has no team review, fall back to `createScheduledPost` with `"draft": true`, and tell Andy the drafts need scheduling in Metricool.
 - Story 1: `instagramData.type: "STORY"`, media = video URL, 10:00, `autoPublish: true`, no text.
-- Story 2: `instagramData.type: "STORY"`, media = story-download.png URL, 10:00 (or 10:01 so it follows Story 1), `autoPublish: false`, which sends a phone notification so Andy can add the link sticker. Put the `ig_story` campaign link in the build report so Andy can copy it.
+- Story 2: `instagramData.type: "STORY"`, media = story-download.png URL, 10:01 so it follows Story 1, `autoPublish: false`, which sends a phone notification so Andy can add the link sticker. Set `text` to the `ig_story` campaign link (a notification Story never publishes its text, so the link only shows in the Metricool app, ready to copy into the sticker). Put the same link in the build report.
+- **The link sticker is required on Story 2.** The Instagram API cannot add link stickers, so this is the one manual step every day. A daily "Glamis sticker reminder" scheduled task pings Andy at 9:58 AM with the link and steps. In every build report, list the sticker step as the first thing Andy has to do the next morning:
+  1. Tap the Metricool notification and open the Story in Instagram.
+  2. Sticker icon → **Link** → paste the `ig_story` link → Customize sticker text: **Get Glamis Guide**.
+  3. Place it over the App Store badge, then share.
 - Reel: `instagramData.type: "REEL"`, `showReelOnFeed: true`, media = video URL, `reel_caption` as `text`, 12:00, `autoPublish: true`.
 - Post (feed days only): `instagramData.type: "POST"`, media = post.png URL, `caption` as `text`, 17:00, `autoPublish: true`.
 - Media URLs: use the commit hash instead of `main` (`.../Glamis_social/<sha>/<day>/...`) so Metricool never gets a stale cached copy.
