@@ -2,7 +2,7 @@
 
 Daily Instagram ([@glamisguide](https://www.instagram.com/glamisguide)) and Facebook Page content for **Glamis Guide**, a free iOS map app for the Imperial Sand Dunes ([glamisguide.app](https://glamisguide.app)).
 
-Andy records a short feature demo and a screenshot each evening. A nightly Claude build writes the copy, renders the graphics, and queues everything in Metricool for the next day.
+Andy records a short feature demo and a screenshot each evening and hands them off with the Glamis Post Mac app. A nightly Claude build writes the copy, renders the graphics, and queues everything in Metricool for the next day.
 
 ## How a day works
 
@@ -28,13 +28,7 @@ Facebook posts go to the Glamis Guide Page. The Facebook Group can't be schedule
 
 ## Adding a day
 
-The easiest way is the **Glamis Post** Mac app (`tools/build-app.sh` puts it on the Desktop):
-
-1. Pick the date the content should **post** (it defaults to tomorrow).
-2. Drop in the video and the screenshot.
-3. Fill in the feature and what it does, then publish. It commits and pushes for you.
-
-Or by hand in VS Code: **Run Task → New Day**, add `video.mp4` and `screenshot.png`, fill in `directions.md`, set `status: ready` and save. The Run on Save extension pushes it (`tools/publish.sh`).
+Use the Glamis Post Mac app (below). Or by hand in VS Code: **Run Task → New Day**, add `video.mp4` and `screenshot.png`, fill in `directions.md`, set `status: ready` and save. The Run on Save extension pushes it (`tools/publish.sh`).
 
 ### directions.md
 
@@ -50,6 +44,34 @@ notes:
 ```
 
 Only `status` and `feature` are required. Claude uses only facts from this file and the screenshot. `headline:` is used word for word if filled. `device:` (`iphone`, `ipad`, `watch`) overrides the automatic frame.
+
+## Glamis Post (Mac app)
+
+A small Mac app on Andy's Desktop for preparing a posting day in one window. Source: `tools/GlamisPost/main.swift`.
+
+1. **Date:** the day the content will **post**, not today. It opens on tomorrow. The line under the title shows that day's lineup (Video Story · Download Story · Reel, plus Feed post on feed days and in ramp-up windows).
+2. **Video** and **Screenshot:** drop or click to choose. The video is copied in as `video.<ext>` (95 MB max, to stay under GitHub's file limit). A JPG screenshot is converted to `screenshot.png`.
+3. **Feature**, **What it does**, **Key facts (optional):** written into `directions.md`.
+4. **Mark Ready:** creates `YYYY-MM-DD/`, writes `directions.md` with `status: ready`, then commits (`Ready: <day> — <feature>`), pulls and pushes to GitHub. The 7:45 PM build picks it up.
+
+Install or update it (needs Xcode or the Command Line Tools):
+
+```bash
+tools/build-app.sh
+```
+
+This compiles the app, builds its icon from `brand/app-icon.png`, and puts **Glamis Post.app** on the Desktop. The app remembers this repo's location, so rebuild if the repo folder moves. Run it again after any change to `main.swift`.
+
+The posting schedule (feed days, ramp-up windows) is coded into the app too. Keep it in sync with `CLAUDE.md` and `tools/nudge.py`.
+
+## Raspberry Pi (in setup)
+
+An always-on Raspberry Pi on the home Wi-Fi, being set up as a background automation server. Its Glamis Guide jobs:
+
+- **App Store Connect analytics:** pull Glamis Guide download and campaign data on a schedule and commit it to this repo, so downloads can be read alongside the Instagram and Facebook results.
+- **Stats dashboard:** a Glamis Guide App Store stats dashboard on the Pi's touchscreen that launches at startup.
+
+None of the Pi's scripts live in this repo yet. Add their location, schedule and data format here once they're running.
 
 ## Folder layout
 
@@ -75,7 +97,7 @@ SETUP.md               One-time setup and the daily checklist
 | `tools/render.py <day>` | Renders `out/story-download.png` (1080×1920) and `out/post.png` (1080×1350) from `copy.json` and the screenshot. Needs Pillow. The layouts are fixed here on purpose. |
 | `tools/new-day.sh [YYYY-MM-DD]` | Creates a day folder from the template (defaults to tomorrow). |
 | `tools/publish.sh <day>/directions.md` | Checks the folder is complete and pushes it when `status: ready`. |
-| `tools/GlamisPost/` + `tools/build-app.sh` | The Glamis Post Mac app. |
+| `tools/GlamisPost/` + `tools/build-app.sh` | The Glamis Post Mac app (see above). |
 | `tools/nudge.py` + `tools/install-nudge.sh` | Apple Reminders on Andy's Mac: "create content" at 6:30 PM and "review drafts" at 8:15 PM the evening before each posting day. Also holds the ramp-up windows. |
 | `tools/measure_mockups.py` | Finds the screen area in each mockup PNG after a mockup is replaced. |
 
