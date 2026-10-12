@@ -5,8 +5,8 @@
   python3 tools/nudge.py daily    # 3 PM: makes sure tomorrow's two reminders exist
 
 Per posting day, both due the evening before:
-  "Glamis: create content for <day>"  5 PM
-  "Glamis: review drafts for <day>"   7 PM
+  "Glamis: create content for <day>"  6:30 PM (content due 7:30 PM)
+  "Glamis: review drafts for <day>"   8:15 PM (build runs 7:45 PM)
 
 Runs on Andy's Mac via launchd (see tools/install-nudge.sh).
 Reminders go to the list "Glamis Social" and sync to iPhone through iCloud.
@@ -106,13 +106,13 @@ def add_day(day):
     still = f"\nStill needed: {', '.join(need)}." if need else "\nFolder is ready."
     add_reminder(
         f"Glamis: create content for {label}",
-        f"Posts: {describe(day)}.\nAdd video, screenshot, directions.md. Set status: ready and save.{still}",
-        dt.datetime.combine(eve, dt.time(17, 0)),
+        f"Posts: {describe(day)}.\nAdd video, screenshot, directions.md. Set status: ready and save by 7:30 PM.{still}",
+        dt.datetime.combine(eve, dt.time(18, 30)),
     )
     add_reminder(
         f"Glamis: review drafts for {label}",
-        "Metricool Planner: check the drafts and schedule them. The build runs at 5:55 PM.",
-        dt.datetime.combine(eve, dt.time(19, 0)),
+        "Metricool Planner: check the drafts and schedule them. The build runs at 7:45 PM.",
+        dt.datetime.combine(eve, dt.time(20, 15)),
     )
     print(f"{label}: {describe(day)}")
 

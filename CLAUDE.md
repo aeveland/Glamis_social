@@ -6,6 +6,8 @@ Daily Instagram (@glamisguide) and Facebook Page content for **Glamis Guide**, a
 
 Posting started Mon 2026-10-12.
 
+Evening before each posting day: Andy has the video, screenshot and `directions.md` (status: ready) in by **7:30 PM PT**. The nightly build runs at **7:45 PM PT** ("Glamis nightly build" scheduled task). Reminders: create content 6:30 PM, review drafts 8:15 PM (`tools/nudge.py`).
+
 | Time (PT) | Type | Asset | Publishing | Days |
 |---|---|---|---|---|
 | 10:00 AM | Story 1 | `<day>/video.*`, the feature demo (hand + voiceover) | Phone notification. Andy **must** add the `ig_story` link sticker by hand (9:58 reminder) | Every day |

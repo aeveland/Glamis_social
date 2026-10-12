@@ -291,7 +291,7 @@ struct ContentView: View {
         if !push.ok {
             return (false, "Saved, but pushing to GitHub failed:\n\(push.output.prefix(300))")
         }
-        return (true, "Published \(day). The build runs at 5:55 PM the evening before.")
+        return (true, "Published \(day). The build runs at 7:45 PM the evening before.")
     }
 }
 
