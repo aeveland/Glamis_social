@@ -30,4 +30,4 @@ VS Code shows a "recommended extension" prompt. Install **Run on Save** (emerald
 2. Drop `video.mp4` (1080p) and `screenshot.png` into the new folder.
 3. Fill in `directions.md`, set `status: ready`, and save. It pushes automatically, and you get a Mac notification.
 4. Have it in by 7:30 PM. The build runs at 7:45 PM; approve the drafts in Metricool after that.
-5. At 10:00 and 10:01 AM, tap each Metricool notification, add the `ig_story` link sticker (link is in the post text and the 9:58 reminder), and post. Don't share either Story without the sticker.
+5. At 10:00 and 10:01 AM, post both Stories by hand in Instagram: save the video and `story-download.png` from the build report, add the `ig_story` link sticker (link is in the report and the 9:58 reminder), and share. Stories are no longer in Metricool.

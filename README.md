@@ -12,15 +12,15 @@ Andy records a short feature demo and a screenshot each evening and hands them o
 | 7:45 PM | Claude (scheduled task "Glamis nightly build") | Writes `copy.json`, renders `out/`, commits, creates the Metricool items, sends a report |
 | After the report | Andy | Checks the items in Metricool and schedules them |
 | 9:58 AM | Claude (scheduled task "Glamis sticker reminder") | Phone reminder with the `ig_story` link |
-| 10:00 / 10:01 AM | Andy | Opens each Story notification, adds the link sticker, and shares |
+| 10:00 / 10:01 AM | Andy | Posts both Stories by hand in Instagram (files from the build report) with the link sticker |
 | 12:00 PM, 5:00 PM | Metricool | Reels and feed posts publish on their own |
 
 ## What gets posted
 
 | Time (PT) | Item | Asset | Publishing |
 |---|---|---|---|
-| 10:00 AM | Instagram Story 1 | Feature video | Notification. Andy adds the link sticker |
-| 10:01 AM | Instagram Story 2 | `out/story-download.png` | Notification. Andy adds the link sticker |
+| 10:00 AM | Instagram Story 1 | Feature video | By hand in Instagram (not in Metricool). Andy adds the link sticker |
+| 10:01 AM | Instagram Story 2 | `out/story-download.png` | By hand in Instagram (not in Metricool). Andy adds the link sticker |
 | 12:00 PM | Instagram Reel + Facebook Reel | Feature video + captions | Auto |
 | 5:00 PM | Instagram feed post + Facebook post | `out/post.png` + captions | Auto. Tue, Thu, Sat, plus every day in holiday ramp-up windows |
 
