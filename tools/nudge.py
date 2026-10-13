@@ -12,6 +12,7 @@ Runs on Andy's Mac via launchd (see tools/install-nudge.sh).
 Reminders go to the list "Glamis Social" and sync to iPhone through iCloud.
 """
 import datetime as dt
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -138,5 +139,11 @@ def weekly():
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else "daily"
+    me = Path(__file__).resolve()
+    before = me.read_bytes()
     pull()
+    if me.read_bytes() != before and not os.environ.get("NUDGE_REEXEC"):
+        # The pull changed this script. Restart so the new version runs, not the old one in memory.
+        os.environ["NUDGE_REEXEC"] = "1"
+        os.execv(sys.executable, [sys.executable, str(me), mode])
     {"daily": daily, "weekly": weekly}[mode]()
