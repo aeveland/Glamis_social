@@ -79,13 +79,20 @@ def osa(s):
 
 
 def add_reminder(title, notes, due):
+    """Create the reminder, or update the due time and notes of an open one with the same title."""
     due_str = due.strftime("%A, %B %-d, %Y at %-I:%M:%S %p")
     script = f'''
 tell application "Reminders"
   if not (exists list "{LIST}") then make new list with properties {{name:"{LIST}"}}
   set L to list "{LIST}"
-  if (count of (reminders of L whose name is "{osa(title)}" and completed is false)) is 0 then
+  set found to (reminders of L whose name is "{osa(title)}" and completed is false)
+  if (count of found) is 0 then
     make new reminder at end of L with properties {{name:"{osa(title)}", body:"{osa(notes)}", due date:date "{due_str}"}}
+  else
+    repeat with r in found
+      set due date of r to date "{due_str}"
+      set body of r to "{osa(notes)}"
+    end repeat
   end if
 end tell'''
     subprocess.run(["osascript", "-e", script], check=True)
@@ -118,7 +125,7 @@ def add_day(day):
 
 
 def daily():
-    """Safety net: make sure tomorrow's pair exists (no duplicates are created)."""
+    """Safety net: make sure tomorrow's pair exists and has current times (no duplicates)."""
     add_day(dt.date.today() + dt.timedelta(days=1))
 
 
