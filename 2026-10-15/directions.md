@@ -1,7 +1,7 @@
 status: ready
 
-feature: Made for iPad
-what it does: Works great on iPad mounted in SXS
+feature: Works on iPad
+what it does: Use Glamis Guide in your SXS dash mounted
 key facts: 
 angle:
 headline:
