@@ -6,7 +6,7 @@ key facts:
 angle:
 headline:
 device:
-notes:
+notes: Feed day override for this day only. Treat 2026-10-16 as a feed day: write caption and fb_caption, and create the Instagram feed post and Facebook post drafts at 17:00 in addition to the Reels.
 
 # Written by the Glamis Post app. Answers go on the same line after the colon.
 # Lines starting with # are ignored.
