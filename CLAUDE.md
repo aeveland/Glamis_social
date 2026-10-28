@@ -16,6 +16,7 @@ Evening before each posting day: Andy has the video, screenshot and `directions.
 | 5:00 PM | Feed post | `<day>/out/post.png` + `caption` | Auto-publish | **Tue, Thu, Sat only**, plus every day in a ramp-up window |
 | 12:00 PM | Facebook Reel | Same `<day>/out/reel.mp4` + `fb_reel_caption` | Auto-publish | Every day |
 | 5:00 PM | Facebook post | `<day>/out/post.png` + `fb_caption` | Auto-publish | Same days as the Instagram feed post |
+| 12:00 PM | TikTok | Same `<day>/out/reel.mp4` + `tt_caption` | Auto-publish | Every day, once TikTok is connected in Metricool |
 
 Facebook goes to the Glamis Guide **Page**. Facebook Groups cannot be scheduled by any tool (Meta removed Groups API access), so never try to post to the group.
 
@@ -45,13 +46,14 @@ A day is buildable when `directions.md` has `status: ready` and the folder holds
      "caption": "…  (feed post, only used on feed days)",
      "reel_caption": "…  (every day)",
      "fb_reel_caption": "…  (every day, Facebook Reel)",
-     "fb_caption": "…  (feed days only, Facebook post)"
+     "fb_caption": "…  (feed days only, Facebook post)",
+     "tt_caption": "…  (every day, TikTok)"
    }
    ```
 3. Run `python3 tools/render.py <day>`. Open both PNGs and check them: no overflow, headline at most 3 lines, the screenshot reads clearly.
 4. Build the video: `pip install --break-system-packages faster-whisper pillow`, `export WHISPER_MODEL=$(tools/get-whisper-model.sh)`, then `python3 tools/render_reel.py <day>`. First run writes `<day>/captions.json` (word timings from the voiceover). Read it and fix only clearly misheard words (app name "Glamis Guide", feature names, landmark names from `directions.md`) by editing the `"w"` values, then delete `out/reel.mp4` and re-run so captions match. Check `out/reel-title.png`, `out/reel-end.png` and a few frames of `out/reel.mp4` (captions readable, not covering the demo's key tap).
 5. Commit `copy.json`, `captions.json` + `out/` with the message `Build: <day> — <feature>`, then push.
-6. Create that day's Metricool items (see below): 2 on normal days (Instagram Reel + Facebook Reel), 4 on feed days (plus Instagram post + Facebook post). Stories are never created in Metricool.
+6. Create that day's Metricool items (see below): Instagram Reel + Facebook Reel every day, plus Instagram post + Facebook post on feed days, plus a TikTok video every day if `getBrandSettings` shows TikTok in `networksData` (if not, skip TikTok and say so in the report). Stories are never created in Metricool.
 7. Report back with the copy and send Andy the two Story files (`out/reel.mp4` and `out/story-download.png`) with SendUserFile, plus `out/post.png` on feed days.
 
 If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`. Use `post_headline` only if it fits that pattern.
@@ -63,6 +65,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - **Reel caption:** 1–2 short lines plus "Free on the App Store. Link in bio." and up to 5 hashtags. Different wording from the feed caption.
 - **Caption:** 2–4 short lines. Say what it does, why it matters out there, then "Free on the App Store. Link in bio." Up to 5 hashtags from: #glamis #glamisdunes #imperialsanddunes #duning #sxs #utv #offroad #sanddunes.
 - **Facebook captions** (`fb_reel_caption`, `fb_caption`): start from the matching Instagram caption (`reel_caption`, `caption`). Replace "Free on the App Store. Link in bio." with "Free on the App Store: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_fb&mt=8". Facebook links are clickable, so the link goes in the caption. Keep at most 3 hashtags.
+- **TikTok caption** (`tt_caption`): start from `reel_caption` and keep "Free on the App Store. Link in bio." (the TikTok bio link is the `glamisguide_tt` campaign link). Captions are not clickable on TikTok, so never paste a URL. 3–5 hashtags from the same list.
 - Use only facts from `directions.md` or the screenshot. Never invent numbers, landmark counts, or features. If a fact is missing, write around it.
 - Speak to dune riders: camp, the flats, Oldsmobile, Competition Hill, holiday weekends. No travel-brochure tone.
 
@@ -101,10 +104,17 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - Facebook Reel: `facebookData.type: "REEL"`, media = `out/reel.mp4` URL, `fb_reel_caption` as `text`, 12:00, `autoPublish: true`.
 - Facebook post (feed days only): `facebookData.type: "POST"`, media = post.png URL, `fb_caption` as `text`, 17:00, `autoPublish: true`.
 
+## TikTok
+
+- Account `glamisguide`, connected to the same Metricool brand (blogId 7334820). Check `getBrandSettings` → `networksData` before creating TikTok items.
+- TikTok video: `"providers":[{"network":"tiktok"}]`, media = `out/reel.mp4` commit-hash URL, `tt_caption` as `text`, 12:00, `autoPublish: true`, `"tiktokData": {"privacyOption": "PUBLIC_TO_EVERYONE", "disableComment": false, "disableDuet": false, "disableStitch": false, "commercialContentOwnBrand": true, "autoAddMusic": false, "isAigc": false}`. `commercialContentOwnBrand` is true because the videos promote Andy's own app.
+- Create TikTok as its own post, never combined with Instagram or Facebook.
+
 ## Campaign links (App Store Connect)
 
 - `ig_story`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_story&mt=8
 - `glamisguide_fb`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_fb&mt=8 (Facebook captions)
+- `glamisguide_tt`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_tt&mt=8 (the TikTok profile/bio link; never in captions)
 - `ig_bio`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_bio&mt=8 (the Instagram profile link)
 
 ## Media hosting
