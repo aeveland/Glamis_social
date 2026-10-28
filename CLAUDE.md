@@ -10,11 +10,11 @@ Evening before each posting day: Andy has the video, screenshot and `directions.
 
 | Time (PT) | Type | Asset | Publishing | Days |
 |---|---|---|---|---|
-| 10:00 AM | Story 1 | `<day>/video.*`, the feature demo (hand + voiceover) | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
+| 10:00 AM | Story 1 | `<day>/out/reel.mp4` (title card + captioned feature demo + end card) | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
 | 10:01 AM | Story 2 | `<day>/out/story-download.png` | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
-| 12:00 PM | Reel | Same `<day>/video.*` + `reel_caption` | Auto-publish | Every day |
+| 12:00 PM | Reel | Same `<day>/out/reel.mp4` + `reel_caption` | Auto-publish | Every day |
 | 5:00 PM | Feed post | `<day>/out/post.png` + `caption` | Auto-publish | **Tue, Thu, Sat only**, plus every day in a ramp-up window |
-| 12:00 PM | Facebook Reel | Same `<day>/video.*` + `fb_reel_caption` | Auto-publish | Every day |
+| 12:00 PM | Facebook Reel | Same `<day>/out/reel.mp4` + `fb_reel_caption` | Auto-publish | Every day |
 | 5:00 PM | Facebook post | `<day>/out/post.png` + `fb_caption` | Auto-publish | Same days as the Instagram feed post |
 
 Facebook goes to the Glamis Guide **Page**. Facebook Groups cannot be scheduled by any tool (Meta removed Groups API access), so never try to post to the group.
@@ -49,9 +49,10 @@ A day is buildable when `directions.md` has `status: ready` and the folder holds
    }
    ```
 3. Run `python3 tools/render.py <day>`. Open both PNGs and check them: no overflow, headline at most 3 lines, the screenshot reads clearly.
-4. Commit `copy.json` + `out/` with the message `Build: <day> — <feature>`, then push.
-5. Create that day's Metricool items (see below): 2 on normal days (Instagram Reel + Facebook Reel), 4 on feed days (plus Instagram post + Facebook post). Stories are never created in Metricool.
-6. Report back with the copy and send Andy the two Story files (`video.*` and `out/story-download.png`) with SendUserFile, plus `out/post.png` on feed days.
+4. Build the video: `pip install --break-system-packages faster-whisper pillow`, `export WHISPER_MODEL=$(tools/get-whisper-model.sh)`, then `python3 tools/render_reel.py <day>`. First run writes `<day>/captions.json` (word timings from the voiceover). Read it and fix only clearly misheard words (app name "Glamis Guide", feature names, landmark names from `directions.md`) by editing the `"w"` values, then delete `out/reel.mp4` and re-run so captions match. Check `out/reel-title.png`, `out/reel-end.png` and a few frames of `out/reel.mp4` (captions readable, not covering the demo's key tap).
+5. Commit `copy.json`, `captions.json` + `out/` with the message `Build: <day> — <feature>`, then push.
+6. Create that day's Metricool items (see below): 2 on normal days (Instagram Reel + Facebook Reel), 4 on feed days (plus Instagram post + Facebook post). Stories are never created in Metricool.
+7. Report back with the copy and send Andy the two Story files (`out/reel.mp4` and `out/story-download.png`) with SendUserFile, plus `out/post.png` on feed days.
 
 If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`. Use `post_headline` only if it fits that pattern.
 
@@ -74,6 +75,8 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 
 ## Approved layouts
 
+- Story/Reel video: approved 2026-10-28 (`2026-10-28/out/reel.mp4` is the reference). `tools/render_reel.py` wraps Andy's raw `video.*`: 2.4 s title card (dune photo, icon + "Glamis Guide" lockup, orange rule, the `feature:` from `directions.md` large, `story_headline` under it), the demo scaled to 1080×1920 with spoken captions (2–4 words in a dark rounded pill at y≈1400, current word in icon orange), then a 4 s end card ("Works offline. Always free." / "No signal. No account. No ads." / App Store badge / glamisguide.app), 0.4 s fades between. Never post the raw `video.*`. Do not change the layout without Andy's sign-off.
+
 - Download Story: approved 2026-10-10 (`2026-10-11/out/story-download.png` is the reference). Icon and app name grouped tight, the whole stack pinned to the bottom with 200 px of padding. Do not change the layout in `render.py` without Andy's sign-off.
 
 ## Instagram specs
@@ -86,16 +89,16 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - Brand: Glamis Guide, `blogId` **7334820**, Instagram `glamisguide`, timezone America/Los_Angeles.
 - Create each piece with `createScheduledPostForReview` (reviewers: `aeveland@me.com`, approvalSystem `any`). If that tool errors because the plan has no team review, fall back to `createScheduledPost` with `"draft": true`, and tell Andy the drafts need scheduling in Metricool.
 - **Stories are not created in Metricool** (changed 2026-10-13). The Instagram API cannot add link stickers, and Metricool's notification flow didn't reliably hand off to Instagram, so Andy posts both Stories directly in the Instagram app. Never create Story items in Metricool.
-- **The link sticker is required on both Stories.** A daily "Glamis sticker reminder" scheduled task pings Andy at 9:58 AM with the link and steps. Every build report sends both Story files (video and `story-download.png`) with SendUserFile, gives their commit-hash raw URLs so Andy can save them on his phone, and lists the Story step first:
-  1. Save the video and `story-download.png` to Photos (from the file cards or the raw links).
+- **The link sticker is required on both Stories.** A daily "Glamis sticker reminder" scheduled task pings Andy at 9:58 AM with the link and steps. Every build report sends both Story files (`out/reel.mp4` and `story-download.png`) with SendUserFile, gives their commit-hash raw URLs so Andy can save them on his phone, and lists the Story step first:
+  1. Save `reel.mp4` and `story-download.png` to Photos (from the file cards or the raw links).
   2. In Instagram as @glamisguide: **+** → **Story** → pick the video. Sticker icon → **Link** → paste the `ig_story` link → Customize sticker text: **Get Glamis Guide**.
   3. Place it in the lower third, clear of the phone screen, and share. Repeat for the image at 10:01, sticker over the App Store badge.
-- Reel: `instagramData.type: "REEL"`, `showReelOnFeed: true`, media = video URL, `reel_caption` as `text`, 12:00, `autoPublish: true`.
+- Reel: `instagramData.type: "REEL"`, `showReelOnFeed: true`, media = `out/reel.mp4` URL, `reel_caption` as `text`, 12:00, `autoPublish: true`.
 - Post (feed days only): `instagramData.type: "POST"`, media = post.png URL, `caption` as `text`, 17:00, `autoPublish: true`.
 - Media URLs: use the commit hash instead of `main` (`.../Glamis_social/<sha>/<day>/...`) so Metricool never gets a stale cached copy.
 - Always include `"instagramData"` and `"providers":[{"network":"instagram"}]` on Instagram items.
 - Facebook Page is connected to the same brand (Page id 1449931404851665). Create Facebook items as **separate** posts, never combined with Instagram, because the captions differ. Use `"providers":[{"network":"facebook"}]` and include `"facebookData"`.
-- Facebook Reel: `facebookData.type: "REEL"`, media = video URL, `fb_reel_caption` as `text`, 12:00, `autoPublish: true`.
+- Facebook Reel: `facebookData.type: "REEL"`, media = `out/reel.mp4` URL, `fb_reel_caption` as `text`, 12:00, `autoPublish: true`.
 - Facebook post (feed days only): `facebookData.type: "POST"`, media = post.png URL, `fb_caption` as `text`, 17:00, `autoPublish: true`.
 
 ## Campaign links (App Store Connect)

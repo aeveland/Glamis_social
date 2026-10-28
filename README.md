@@ -19,9 +19,9 @@ Andy records a short feature demo and a screenshot each evening and hands them o
 
 | Time (PT) | Item | Asset | Publishing |
 |---|---|---|---|
-| 10:00 AM | Instagram Story 1 | Feature video | By hand in Instagram (not in Metricool). Andy adds the link sticker |
+| 10:00 AM | Instagram Story 1 | Feature video (`out/reel.mp4`: title, captions, end card) | By hand in Instagram (not in Metricool). Andy adds the link sticker |
 | 10:01 AM | Instagram Story 2 | `out/story-download.png` | By hand in Instagram (not in Metricool). Andy adds the link sticker |
-| 12:00 PM | Instagram Reel + Facebook Reel | Feature video + captions | Auto |
+| 12:00 PM | Instagram Reel + Facebook Reel | `out/reel.mp4` + captions | Auto |
 | 5:00 PM | Instagram feed post + Facebook post | `out/post.png` + captions | Auto. Tue, Thu, Sat, plus every day in holiday ramp-up windows |
 
 Facebook posts go to the Glamis Guide Page. The Facebook Group can't be scheduled through any tool.
