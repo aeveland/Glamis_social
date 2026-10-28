@@ -65,7 +65,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - **Reel caption:** 1–2 short lines plus "Free on the App Store. Link in bio." and up to 5 hashtags. Different wording from the feed caption.
 - **Caption:** 2–4 short lines. Say what it does, why it matters out there, then "Free on the App Store. Link in bio." Up to 5 hashtags from: #glamis #glamisdunes #imperialsanddunes #duning #sxs #utv #offroad #sanddunes.
 - **Facebook captions** (`fb_reel_caption`, `fb_caption`): start from the matching Instagram caption (`reel_caption`, `caption`). Replace "Free on the App Store. Link in bio." with "Free on the App Store: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_fb&mt=8". Facebook links are clickable, so the link goes in the caption. Keep at most 3 hashtags.
-- **TikTok caption** (`tt_caption`): start from `reel_caption` and keep "Free on the App Store. Link in bio." (the TikTok bio link is the `glamisguide_tt` campaign link). Captions are not clickable on TikTok, so never paste a URL. 3–5 hashtags from the same list.
+- **TikTok caption** (`tt_caption`): start from `reel_caption` but replace "Free on the App Store. Link in bio." with "Free on the App Store. Search \"Glamis Guide\" to download." The TikTok account has no bio link (not a Business account), so never say "link in bio" on TikTok. Captions are not clickable on TikTok, so never paste a URL. 3–5 hashtags from the same list.
 - Use only facts from `directions.md` or the screenshot. Never invent numbers, landmark counts, or features. If a fact is missing, write around it.
 - Speak to dune riders: camp, the flats, Oldsmobile, Competition Hill, holiday weekends. No travel-brochure tone.
 
@@ -114,7 +114,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 
 - `ig_story`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_story&mt=8
 - `glamisguide_fb`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_fb&mt=8 (Facebook captions)
-- `glamisguide_tt`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_tt&mt=8 (the TikTok profile/bio link; never in captions)
+- `glamisguide_tt`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_tt&mt=8 (reserved for the TikTok bio link once the account switches to Business; not in use yet, never in captions)
 - `ig_bio`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_bio&mt=8 (the Instagram profile link)
 
 ## Media hosting
