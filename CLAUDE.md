@@ -10,7 +10,7 @@ Evening before each posting day: Andy has the video, screenshot and `directions.
 
 | Time (PT) | Type | Asset | Publishing | Days |
 |---|---|---|---|---|
-| 10:00 AM | Story 1 | `<day>/out/reel.mp4` (title card + captioned feature demo + end card) | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
+| 10:00 AM | Story 1 | `<day>/out/reel.mp4` (captioned feature demo with headline overlay + end card) | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
 | 10:01 AM | Story 2 | `<day>/out/story-download.png` | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
 | 12:00 PM | Reel | Same `<day>/out/reel.mp4` + `reel_caption` | Auto-publish | Every day |
 | 5:00 PM | Feed post | `<day>/out/post.png` + `caption` | Auto-publish | **Tue, Thu, Sat only**, plus every day in a ramp-up window |
@@ -54,7 +54,7 @@ A day is buildable when `directions.md` has `status: ready` and the folder holds
    }
    ```
 3. Run `python3 tools/render.py <day>`. Open both PNGs and check them: no overflow, headline at most 3 lines, the screenshot reads clearly.
-4. Build the video: `pip install --break-system-packages faster-whisper pillow`, `export WHISPER_MODEL=$(tools/get-whisper-model.sh)`, then `python3 tools/render_reel.py <day>`. First run writes `<day>/captions.json` (word timings from the voiceover). Read it and fix only clearly misheard words (app name "Glamis Guide", feature names, landmark names from `directions.md`) by editing the `"w"` values, then delete `out/reel.mp4` and re-run so captions match. Check `out/reel-title.png`, `out/reel-end.png` and a few frames of `out/reel.mp4` (captions readable, not covering the demo's key tap).
+4. Build the video: `pip install --break-system-packages faster-whisper pillow`, `export WHISPER_MODEL=$(tools/get-whisper-model.sh)`, then `python3 tools/render_reel.py <day>`. First run writes `<day>/captions.json` (word timings from the voiceover). Read it and fix only clearly misheard words (app name "Glamis Guide", feature names, landmark names from `directions.md`) by editing the `"w"` values, then delete `out/reel.mp4` and re-run so captions match. Check `out/reel-cover.png`, `out/reel-headline.png`, `out/reel-end.png` and a few frames of `out/reel.mp4` (captions readable, not covering the demo's key tap).
 5. Commit `copy.json`, `captions.json` + `out/` with the message `Build: <day> — <feature>`, then push.
 6. Create that day's Metricool items (see below): Instagram Reel + Facebook Reel every day, plus Instagram post + Facebook post on feed days, plus a TikTok video every day if `getBrandSettings` shows TikTok in `networksData` (if not, skip TikTok and say so in the report), plus a YouTube Short every day if `networksData` shows YouTube (if not, skip it and say so). Stories are never created in Metricool.
 7. Report back with the copy and send Andy the two Story files (`out/reel.mp4` and `out/story-download.png`) with SendUserFile, plus `out/post.png` on feed days.
@@ -83,7 +83,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 
 ## Approved layouts
 
-- Story/Reel video: approved 2026-10-28 (`2026-10-28/out/reel.mp4` is the reference). `tools/render_reel.py` wraps Andy's raw `video.*`: 2.4 s title card (dune photo, icon + "Glamis Guide" lockup, orange rule, the `feature:` from `directions.md` large, `story_headline` under it), the demo scaled to 1080×1920 with spoken captions (2–4 words in a dark rounded pill at y≈1400, current word in icon orange), then a 4 s end card ("Works offline. Always free." / "No signal. No account. No ads." / App Store badge / glamisguide.app), 0.4 s fades between. Never post the raw `video.*`. Do not change the layout without Andy's sign-off.
+- Story/Reel video: approved 2026-11-01 (`2026-11-02/out/reel.mp4` is the reference). Replaces the 2026-10-28 layout, whose 2.4 s static title card led viewers to swipe past before they saw it was a video. `tools/render_reel.py` wraps Andy's raw `video.*`: the demo starts on frame one, scaled to 1080×1920, with `story_headline` in a dark rounded pill near the top (y≈290, orange accent under it) for the first 2.6 s, fading out over 0.4 s; spoken captions (2–4 words in a dark rounded pill at y≈1400, current word in icon orange); then a 4 s end card ("Works offline. Always free." / "No signal. No account. No ads." / App Store badge / glamisguide.app) with a 0.4 s fade. The old title card (dune photo, icon + "Glamis Guide" lockup, orange rule, `feature:` large, `story_headline` under it) is now `out/reel-cover.png`, used only as the Reel cover image. Never post the raw `video.*`. Do not change the layout without Andy's sign-off.
 
 - Download Story: approved 2026-10-10 (`2026-10-11/out/story-download.png` is the reference). Icon and app name grouped tight, the whole stack pinned to the bottom with 200 px of padding. Do not change the layout in `render.py` without Andy's sign-off.
 
@@ -101,6 +101,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
   1. Save `reel.mp4` and `story-download.png` to Photos (from the file cards or the raw links).
   2. In Instagram as @glamisguide: **+** → **Story** → pick the video. Sticker icon → **Link** → paste the `ig_story` link → Customize sticker text: **Get Glamis Guide**.
   3. Place it in the lower third, clear of the phone screen, and share. Repeat for the image at 10:01, sticker over the App Store badge.
+- Cover image: every video item (Instagram Reel, Facebook Reel, TikTok, YouTube Short) sets `videoThumbnailUrl` to the commit-hash URL of `out/reel-cover.png`. If a network rejects it with `VIDEO_THUMBNAIL_NOT_APPLICABLE`, retry that item without the field and say so in the report.
 - Reel: `instagramData.type: "REEL"`, `showReelOnFeed: true`, media = `out/reel.mp4` URL, `reel_caption` as `text`, 12:00, `autoPublish: true`.
 - Post (feed days only): `instagramData.type: "POST"`, media = post.png URL, `caption` as `text`, 17:00, `autoPublish: true`.
 - Media URLs: use the commit hash instead of `main` (`.../Glamis_social/<sha>/<day>/...`) so Metricool never gets a stale cached copy.

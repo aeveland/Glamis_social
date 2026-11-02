@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Build the daily Story/Reel video: title card, captioned demo, end card.
+"""Build the daily Story/Reel video: captioned demo (headline over the opening), end card.
+
+The demo starts on frame one so viewers see motion immediately (a static title
+card made people swipe before they realised it was a video). The headline sits
+over the first seconds of the demo, and the old title card is saved as
+out/reel-cover.png for use as the Reel cover image.
 
 Usage:  python3 tools/render_reel.py 2026-10-28
 
@@ -8,6 +13,7 @@ Reads   <day>/directions.md  (feature: line becomes the title)
         <day>/video.*        (hand + voiceover demo)
         <day>/captions.json  (optional; word timings, written on first run)
 Writes  <day>/out/reel.mp4   (1080x1920, 30 fps, H.264 + AAC)
+        <day>/out/reel-cover.png (title card, used as the Reel cover image)
         <day>/captions.json  (word timings from the voiceover; edit the "w"
                               values to fix a misheard word, then re-run)
 
@@ -29,7 +35,9 @@ from render import (BRAND, ROOT, STORY, WHITE, cover, font, parse_directions,  #
 
 ORANGE = (232, 98, 26, 255)      # app icon orange
 FPS = 30
-TITLE_DUR = 2.4
+HEADLINE_DUR = 2.6   # headline overlay on the opening of the demo
+HEADLINE_FADE = 0.4
+HEADLINE_TOP = 290   # just below the top safe zone
 END_DUR = 4.0
 XFADE = 0.4
 
@@ -182,6 +190,31 @@ def render_end(out):
     c.convert("RGB").save(out, quality=95)
 
 
+def render_headline(headline, out):
+    """Transparent overlay: headline in a dark pill near the top, same style as captions."""
+    img = Image.new("RGBA", STORY, (0, 0, 0, 0))
+    if headline:
+        d = ImageDraw.Draw(img)
+        fnt = font("InterDisplay-Bold.otf", 76)
+        lines = wrap(d, headline, fnt, 880)
+        off, h = ink(d, fnt, "Hg")
+        lh = 92
+        widest = max(d.textlength(l, font=fnt) for l in lines)
+        padx, pady = 40, 30
+        block_h = lh * (len(lines) - 1) + h
+        top = HEADLINE_TOP
+        d.rounded_rectangle([540 - widest / 2 - padx, top - pady,
+                             540 + widest / 2 + padx, top + block_h + pady],
+                            radius=30, fill=(20, 12, 6, 190))
+        for i, line in enumerate(lines):
+            w = d.textlength(line, font=fnt)
+            d.text((540 - w / 2, top + i * lh - off), line, font=fnt, fill=WHITE)
+        # Orange accent under the pill, echoing the cover's rule.
+        y = top + block_h + pady + 18
+        d.rounded_rectangle([540 - 50, y, 540 + 50, y + 8], radius=4, fill=ORANGE)
+    img.save(out)
+
+
 # ---------------------------------------------------------------- captions
 
 def transcribe(video, tmp):
@@ -297,38 +330,45 @@ def main():
         dur = probe_duration(video)
         main_end = min(dur, (words[-1]["e"] + 0.8) if words else dur)
 
-        title_png, end_png = Path(tmp) / "title.png", Path(tmp) / "end.png"
-        render_title(feature, copy.get("story_headline", ""), title_png)
+        cover_png, end_png = Path(tmp) / "cover.png", Path(tmp) / "end.png"
+        head_png = Path(tmp) / "headline.png"
+        headline = copy.get("story_headline", "")
+        render_title(feature, headline, cover_png)
+        render_headline(headline, head_png)
         render_end(end_png)
         caps = build_caption_track(words, 0, main_end, tmp)
 
-        off1 = TITLE_DUR - XFADE                      # main starts here
-        off2 = off1 + main_end - XFADE                # end card starts here
-        total = off2 + END_DUR
+        off_end = main_end - XFADE                    # end card starts here
+        total = off_end + END_DUR
+        fade_st = HEADLINE_DUR - HEADLINE_FADE
         fc = (
-            f"[0:v]scale=1080:1920,setsar=1,fps={FPS},format=yuv420p[t];"
-            f"[1:v]trim=0:{main_end:.3f},setpts=PTS-STARTPTS,scale=1080:1920:force_original_aspect_ratio=increase,"
+            f"[0:v]trim=0:{main_end:.3f},setpts=PTS-STARTPTS,scale=1080:1920:force_original_aspect_ratio=increase,"
             f"crop=1080:1920,setsar=1,fps={FPS}[m0];"
-            f"[2:v]fps={FPS},format=rgba[c];"
-            f"[m0][c]overlay=0:0:shortest=1,format=yuv420p[m];"
+            f"[1:v]fps={FPS},format=rgba[c];"
+            f"[2:v]fps={FPS},format=rgba,fade=t=out:st={fade_st:.3f}:d={HEADLINE_FADE}:alpha=1[h];"
+            f"[m0][c]overlay=0:0:shortest=1[m1];"
+            f"[m1][h]overlay=0:0:eof_action=pass,format=yuv420p[m];"
             f"[3:v]scale=1080:1920,setsar=1,fps={FPS},format=yuv420p[e];"
-            f"[t][m]xfade=transition=fade:duration={XFADE}:offset={off1:.3f}[tm];"
-            f"[tm][e]xfade=transition=fade:duration={XFADE}:offset={off2:.3f},format=yuv420p[v];"
-            f"[1:a]atrim=0:{main_end:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={main_end - 0.4:.3f}:d=0.4,"
-            f"adelay={int(off1 * 1000)}:all=1,apad=whole_dur={total:.3f}[a]"
+            f"[m][e]xfade=transition=fade:duration={XFADE}:offset={off_end:.3f},format=yuv420p[v];"
+            f"[0:a]atrim=0:{main_end:.3f},asetpts=PTS-STARTPTS,afade=t=out:st={main_end - 0.4:.3f}:d=0.4,"
+            f"apad=whole_dur={total:.3f}[a]"
         )
         out = outdir / "reel.mp4"
         run(["ffmpeg", "-y",
-             "-loop", "1", "-t", f"{TITLE_DUR}", "-i", str(title_png),
              "-i", str(video),
              "-f", "concat", "-safe", "0", "-i", str(caps),
+             "-loop", "1", "-t", f"{HEADLINE_DUR}", "-i", str(head_png),
              "-loop", "1", "-t", f"{END_DUR}", "-i", str(end_png),
              "-filter_complex", fc, "-map", "[v]", "-map", "[a]",
              "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-r", str(FPS),
              "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", str(out)])
-        # Keep the card stills for review.
-        Image.open(title_png).save(outdir / "reel-title.png")
+        # Stills: cover for the Reel thumbnail, plus the headline and end card for review.
+        Image.open(cover_png).convert("RGB").save(outdir / "reel-cover.png")
+        Image.open(head_png).save(outdir / "reel-headline.png")
         Image.open(end_png).save(outdir / "reel-end.png")
+        old_title = outdir / "reel-title.png"
+        if old_title.exists():
+            old_title.unlink()
     print(out)
 
 
