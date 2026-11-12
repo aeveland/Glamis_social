@@ -70,6 +70,7 @@ struct DropZone: View {
     let symbol: String
     let types: [UTType]
     let isImage: Bool
+    var filledSymbol = "film"
     @Binding var url: URL?
 
     var body: some View {
@@ -78,7 +79,7 @@ struct DropZone: View {
                 if isImage, let img = NSImage(contentsOf: url) {
                     Image(nsImage: img).resizable().scaledToFit().frame(maxHeight: 150)
                 } else {
-                    Image(systemName: "film").font(.system(size: 40)).foregroundColor(.secondary)
+                    Image(systemName: filledSymbol).font(.system(size: 40)).foregroundColor(.secondary)
                 }
                 Text(url.lastPathComponent).font(.caption).lineLimit(1).truncationMode(.middle)
             } else {
@@ -121,6 +122,7 @@ struct DropZone: View {
 final class PostModel: ObservableObject {
     @Published var date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
     @Published var video: URL?
+    @Published var voiceover: URL?
     @Published var screenshot: URL?
     @Published var feature = ""
     @Published var whatItDoes = ""
@@ -130,7 +132,7 @@ final class PostModel: ObservableObject {
     @Published var success = false
 
     var canPublish: Bool {
-        video != nil && screenshot != nil
+        video != nil && voiceover != nil && screenshot != nil
             && !feature.trimmingCharacters(in: .whitespaces).isEmpty
             && !whatItDoes.trimmingCharacters(in: .whitespaces).isEmpty
             && !busy
@@ -147,7 +149,7 @@ final class PostModel: ObservableObject {
     }
 
     func publish() {
-        guard let video = video, let screenshot = screenshot else { return }
+        guard let video = video, let voiceover = voiceover, let screenshot = screenshot else { return }
         let day = dayString(date)
         let featureText = oneLine(feature)
         let what = oneLine(whatItDoes)
@@ -156,7 +158,7 @@ final class PostModel: ObservableObject {
         success = false
         message = "Saving…"
         DispatchQueue.global(qos: .userInitiated).async {
-            let result = ContentView.writeAndPush(day: day, video: video, screenshot: screenshot,
+            let result = ContentView.writeAndPush(day: day, video: video, voiceover: voiceover, screenshot: screenshot,
                                                   feature: featureText, what: what, facts: facts)
             DispatchQueue.main.async {
                 self.busy = false
@@ -186,8 +188,10 @@ struct ContentView: View {
             }
 
             HStack(spacing: 14) {
-                DropZone(title: "Video", symbol: "video",
+                DropZone(title: "Screen Recording", symbol: "video",
                          types: [.movie, .quickTimeMovie, .mpeg4Movie], isImage: false, url: $m.video)
+                DropZone(title: "Voiceover", symbol: "mic",
+                         types: [.audio], isImage: false, filledSymbol: "waveform", url: $m.voiceover)
                 DropZone(title: "Screenshot", symbol: "photo",
                          types: [.image], isImage: true, url: $m.screenshot)
             }
@@ -216,7 +220,7 @@ struct ContentView: View {
             }
         }
         .padding(24)
-        .frame(width: 600)
+        .frame(width: 720)
     }
 
     func field(_ label: String, _ prompt: String, _ text: Binding<String>) -> some View {
@@ -226,7 +230,7 @@ struct ContentView: View {
         }
     }
 
-    static func writeAndPush(day: String, video: URL, screenshot: URL,
+    static func writeAndPush(day: String, video: URL, voiceover: URL, screenshot: URL,
                              feature: String, what: String, facts: String) -> (ok: Bool, message: String) {
         let fm = FileManager.default
         let folder = repoURL.appendingPathComponent(day)
@@ -237,14 +241,17 @@ struct ContentView: View {
             }
             try fm.createDirectory(at: folder, withIntermediateDirectories: true)
 
-            // Replace any earlier video/screenshot for this day.
+            // Replace any earlier video/voiceover/screenshot for this day.
             for item in (try? fm.contentsOfDirectory(atPath: folder.path)) ?? []
-            where item.hasPrefix("video.") || item.hasPrefix("screenshot.") {
+            where item.hasPrefix("video.") || item.hasPrefix("voiceover.") || item.hasPrefix("screenshot.") {
                 try? fm.removeItem(at: folder.appendingPathComponent(item))
             }
 
             let ext = video.pathExtension.isEmpty ? "mov" : video.pathExtension.lowercased()
             try fm.copyItem(at: video, to: folder.appendingPathComponent("video.\(ext)"))
+
+            let voiceExt = voiceover.pathExtension.isEmpty ? "m4a" : voiceover.pathExtension.lowercased()
+            try fm.copyItem(at: voiceover, to: folder.appendingPathComponent("voiceover.\(voiceExt)"))
 
             let shotDest = folder.appendingPathComponent("screenshot.png")
             if screenshot.pathExtension.lowercased() == "png" {
@@ -266,6 +273,7 @@ struct ContentView: View {
             key facts: \(facts)
             angle:
             headline:
+            end title:
             device:
             notes:
 

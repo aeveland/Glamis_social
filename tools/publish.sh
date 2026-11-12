@@ -20,6 +20,7 @@ STATUS=$(grep -E '^status:' "$DAY/directions.md" | head -1 | sed 's/^status:[[:s
 
 missing=()
 ls "$DAY"/video.* >/dev/null 2>&1 || missing+=("video.mp4")
+ls "$DAY"/voiceover.* >/dev/null 2>&1 || missing+=("voiceover.m4a")
 ls "$DAY"/screenshot.* >/dev/null 2>&1 || missing+=("screenshot.png")
 FEATURE=$(grep -E '^feature:' "$DAY/directions.md" | head -1 | sed 's/^feature:[[:space:]]*//')
 [ -n "$FEATURE" ] || missing+=("feature name")

@@ -16,6 +16,6 @@ if [ -d "$DAY" ]; then
 else
   mkdir -p "$DAY"
   cp _template/directions.md "$DAY/directions.md"
-  echo "Created $DAY/ — add video.mp4 and screenshot.png, then fill in directions.md"
+  echo "Created $DAY/ — add video.mp4, voiceover.m4a and screenshot.png, then fill in directions.md"
 fi
 command -v code >/dev/null && code "$DAY/directions.md" || true

@@ -2,13 +2,13 @@
 
 Daily Instagram ([@glamisguide](https://www.instagram.com/glamisguide)) and Facebook Page content for **Glamis Guide**, a free iOS map app for the Imperial Sand Dunes ([glamisguide.app](https://glamisguide.app)).
 
-Andy records a short feature demo and a screenshot each evening and hands them off with the Glamis Post Mac app. A nightly Claude build writes the copy, renders the graphics, and queues everything in Metricool for the next day.
+Andy records a short screen recording, a voiceover and a screenshot each evening and hands them off with the Glamis Post Mac app. A nightly Claude build writes the copy, renders the graphics, and queues everything in Metricool for the next day.
 
 ## How a day works
 
 | When (PT) | Who | What |
 |---|---|---|
-| By 7:30 PM, the evening before | Andy | Adds `video`, `screenshot.png` and `directions.md` (`status: ready`) to a new day folder and publishes it |
+| By 7:30 PM, the evening before | Andy | Adds `video`, `voiceover`, `screenshot.png` and `directions.md` (`status: ready`) to a new day folder and publishes it |
 | 7:45 PM | Claude (scheduled task "Glamis nightly build") | Writes `copy.json`, renders `out/`, commits, creates the Metricool items, sends a report |
 | After the report | Andy | Checks the items in Metricool and schedules them |
 | 9:58 AM | Claude (scheduled task "Glamis sticker reminder") | Phone reminder with the `ig_story` link |
@@ -19,7 +19,7 @@ Andy records a short feature demo and a screenshot each evening and hands them o
 
 | Time (PT) | Item | Asset | Publishing |
 |---|---|---|---|
-| 10:00 AM | Instagram Story 1 | Feature video (`out/reel.mp4`: title, captions, end card) | By hand in Instagram (not in Metricool). Andy adds the link sticker |
+| 10:00 AM | Instagram Story 1 | Feature video (`out/reel.mp4`: framed screen recording, voiceover, captions, end card) | By hand in Instagram (not in Metricool). Andy adds the link sticker |
 | 10:01 AM | Instagram Story 2 | `out/story-download.png` | By hand in Instagram (not in Metricool). Andy adds the link sticker |
 | 12:00 PM | Instagram Reel + Facebook Reel | `out/reel.mp4` + captions | Auto |
 | 5:00 PM | Instagram feed post + Facebook post | `out/post.png` + captions | Auto. Tue, Thu, Sat, plus every day in holiday ramp-up windows |
@@ -28,7 +28,7 @@ Facebook posts go to the Glamis Guide Page. The Facebook Group can't be schedule
 
 ## Adding a day
 
-Use the Glamis Post Mac app (below). Or by hand in VS Code: **Run Task → New Day**, add `video.mp4` and `screenshot.png`, fill in `directions.md`, set `status: ready` and save. The Run on Save extension pushes it (`tools/publish.sh`).
+Use the Glamis Post Mac app (below). Or by hand in VS Code: **Run Task → New Day**, add `video.mp4`, `voiceover.m4a` and `screenshot.png`, fill in `directions.md`, set `status: ready` and save. The Run on Save extension pushes it (`tools/publish.sh`).
 
 ### directions.md
 
@@ -39,18 +39,19 @@ what it does: Mark camp, create a waypoint, or record a ride
 key facts:
 angle:
 headline:
+end title:
 device:
 notes:
 ```
 
-Only `status` and `feature` are required. Claude uses only facts from this file and the screenshot. `headline:` is used word for word if filled. `device:` (`iphone`, `ipad`, `watch`) overrides the automatic frame.
+Only `status` and `feature` are required. Claude uses only facts from this file and the screenshot. `headline:` and `end title:` (the closing title on the video's end card) are used word for word if filled. `device:` (`iphone`, `ipad`, `watch`) overrides the automatic frame.
 
 ## Glamis Post (Mac app)
 
 A small Mac app on Andy's Desktop for preparing a posting day in one window. Source: `tools/GlamisPost/main.swift`.
 
 1. **Date:** the day the content will **post**, not today. It opens on tomorrow. The line under the title shows that day's lineup (Video Story · Download Story · Reel, plus Feed post on feed days and in ramp-up windows).
-2. **Video** and **Screenshot:** drop or click to choose. The video is copied in as `video.<ext>` (95 MB max, to stay under GitHub's file limit). A JPG screenshot is converted to `screenshot.png`.
+2. **Screen Recording**, **Voiceover** and **Screenshot:** drop or click to choose. The recording is copied in as `video.<ext>` (95 MB max, to stay under GitHub's file limit) and the audio as `voiceover.<ext>`. Start the voiceover at the same moment as the recording so they stay in sync. A JPG screenshot is converted to `screenshot.png`.
 3. **Feature**, **What it does**, **Key facts (optional):** written into `directions.md`.
 4. **Mark Ready:** creates `YYYY-MM-DD/`, writes `directions.md` with `status: ready`, then commits (`Ready: <day> — <feature>`), pulls and pushes to GitHub. The 7:45 PM build picks it up.
 
@@ -79,7 +80,8 @@ None of the Pi's scripts live in this repo yet. Add their location, schedule and
 brand/                 Fixed assets: icon, badge, fonts, photos, device mockups. Don't edit casually.
 _template/             directions.md copied into each new day
 YYYY-MM-DD/            One per posting day
-  video.mp4|.mov       Feature demo (Andy)
+  video.mp4|.mov       Screen recording of the feature (Andy)
+  voiceover.m4a        Voiceover, starts with the video (Andy)
   screenshot.png       App screenshot (Andy)
   directions.md        Brief (Andy)
   copy.json            Headlines and captions (Claude)

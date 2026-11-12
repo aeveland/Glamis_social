@@ -6,11 +6,11 @@ Daily Instagram (@glamisguide), Facebook Page, TikTok and YouTube Shorts content
 
 Posting started Mon 2026-10-12.
 
-Evening before each posting day: Andy has the video, screenshot and `directions.md` (status: ready) in by **7:30 PM PT**. The nightly build runs at **7:45 PM PT** ("Glamis nightly build" scheduled task). Reminders: create content 6:30 PM, review drafts 8:15 PM (`tools/nudge.py`).
+Evening before each posting day: Andy has the screen recording, voiceover, screenshot and `directions.md` (status: ready) in by **7:30 PM PT**. The nightly build runs at **7:45 PM PT** ("Glamis nightly build" scheduled task). Reminders: create content 6:30 PM, review drafts 8:15 PM (`tools/nudge.py`).
 
 | Time (PT) | Type | Asset | Publishing | Days |
 |---|---|---|---|---|
-| 10:00 AM | Story 1 | `<day>/out/reel.mp4` (captioned feature demo with headline overlay + end card) | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
+| 10:00 AM | Story 1 | `<day>/out/reel.mp4` (framed screen recording with voiceover, captions + end card) | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
 | 10:01 AM | Story 2 | `<day>/out/story-download.png` | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
 | 12:00 PM | Reel | Same `<day>/out/reel.mp4` + `reel_caption` | Auto-publish | Every day |
 | 5:00 PM | Feed post | `<day>/out/post.png` + `caption` | Auto-publish | **Tue, Thu, Sat only**, plus every day in a ramp-up window |
@@ -29,19 +29,20 @@ Everything goes into Metricool **as drafts for review** (`createScheduledPostFor
 
 - `brand/`: fixed assets. Do not edit without Andy.
 - `_template/directions.md`: copied into each new day.
-- `YYYY-MM-DD/`: one per posting day. Holds `video.mp4`, `screenshot.png`, `directions.md` (Andy), plus `copy.json` and `out/` (Claude).
+- `YYYY-MM-DD/`: one per posting day. Holds `video.*` (screen recording, no sound needed), `voiceover.*` (separate audio, starts with the video), `screenshot.png`, `directions.md` (Andy), plus `copy.json` and `out/` (Claude).
 - `2026-10-11/`: test day and the approved reference (never posted). Never schedule it.
 - `tools/render.py`: the only way graphics get made. Layouts live in code so the series stays consistent.
 
 ## Building a day
 
-A day is buildable when `directions.md` has `status: ready` and the folder holds a video and a screenshot.
+A day is buildable when `directions.md` has `status: ready` and the folder holds a video, a voiceover and a screenshot.
 
 1. Read `directions.md`. Look at `screenshot.png` and a frame of the video to confirm the feature.
 2. Write `<day>/copy.json`:
    ```json
    {
      "story_headline": "Know every hill by name.",
+     "end_title": "Find camp before dark.",
      "post_headline": "Every landmark, one tap away.",
      "post_subline": "Elevation, coordinates, directions. Oldsmobile Hill to Glamis Flats.",
      "caption": "…  (feed post, only used on feed days)",
@@ -54,7 +55,7 @@ A day is buildable when `directions.md` has `status: ready` and the folder holds
    }
    ```
 3. Run `python3 tools/render.py <day>`. Open both PNGs and check them: no overflow, headline at most 3 lines, the screenshot reads clearly.
-4. Build the video: `pip install --break-system-packages faster-whisper pillow`, `export WHISPER_MODEL=$(tools/get-whisper-model.sh)`, then `python3 tools/render_reel.py <day>`. First run writes `<day>/captions.json` (word timings from the voiceover). Read it and fix only clearly misheard words (app name "Glamis Guide", feature names, landmark names from `directions.md`) by editing the `"w"` values, then delete `out/reel.mp4` and re-run so captions match. Check `out/reel-cover.png`, `out/reel-headline.png`, `out/reel-end.png` and a few frames of `out/reel.mp4` (captions readable, not covering the demo's key tap).
+4. Build the video: `pip install --break-system-packages faster-whisper pillow`, `export WHISPER_MODEL=$(tools/get-whisper-model.sh)`, then `python3 tools/render_reel.py <day>`. First run writes `<day>/captions.json` (word timings from the voiceover). Read it and fix only clearly misheard words (app name "Glamis Guide", feature names, landmark names from `directions.md`) by editing the `"w"` values, then delete `out/reel.mp4` and re-run so captions match. Captions come from `voiceover.*`. Check `out/reel-cover.png`, `out/reel-end.png` and a few frames of `out/reel.mp4` (right device frame, captions readable, end title fits, sound present). If the script warns that there is no voiceover, stop and tell Andy instead of posting a silent video.
 5. Commit `copy.json`, `captions.json` + `out/` with the message `Build: <day> — <feature>`, then push.
 6. Create that day's Metricool items (see below): Instagram Reel + Facebook Reel every day, plus Instagram post + Facebook post on feed days, plus a TikTok video every day if `getBrandSettings` shows TikTok in `networksData` (if not, skip TikTok and say so in the report), plus a YouTube Short every day if `networksData` shows YouTube (if not, skip it and say so). Stories are never created in Metricool.
 7. Report back with the copy and send Andy the two Story files (`out/reel.mp4` and `out/story-download.png`) with SendUserFile, plus `out/post.png` on feed days.
@@ -64,6 +65,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 ## Copy rules
 
 - **Headlines:** 3–6 words. Sentence case. End with a period. Benefit first, about the rider and not the app. Examples: "Never lose camp again." / "The dunes, in your pocket." / "Know every hill by name."
+- **End title** (`end_title`): the closing title on the video's end card. 2–5 words, sentence case, ends with a period. It is the payoff of that day's feature, different wording from `story_headline`. Example for a camp search demo: "Find camp before dark." If `end title:` is filled in `directions.md`, use it verbatim.
 - **Post subline:** two short sentences. Plain facts that explain the headline. Example: "NAIP imagery stored on your phone. Zero bars required."
 - **Reel caption:** 1–2 short lines plus "Free on the App Store. Link in bio." and up to 5 hashtags. Different wording from the feed caption.
 - **Caption:** 2–4 short lines. Say what it does, why it matters out there, then "Free on the App Store. Link in bio." Up to 5 hashtags from: #glamis #glamisdunes #imperialsanddunes #duning #sxs #utv #offroad #sanddunes.
@@ -81,9 +83,11 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 - Small and near-square (under 1000 px, ratio 0.7–1.0) → `watch` (watch on wrist)
 - Anything else → `ipad` (two hands, landscape). iPad screenshots should be taken in landscape.
 
+`render_reel.py` applies the same size rule to the screen recording and draws a flat frame around it (iPhone, iPad portrait or landscape, Watch). The same `device:` line overrides it. A Watch demo recorded through iPhone mirroring needs `device: watch` and a recording cropped to the Watch screen.
+
 ## Approved layouts
 
-- Story/Reel video: approved 2026-11-01 (`2026-11-02/out/reel.mp4` is the reference). Replaces the 2026-10-28 layout, whose 2.4 s static title card led viewers to swipe past before they saw it was a video. `tools/render_reel.py` wraps Andy's raw `video.*`: the demo starts on frame one, scaled to 1080×1920, with `story_headline` in a dark rounded pill near the top (y≈290, orange accent under it) for the first 2.6 s, fading out over 0.4 s; spoken captions (2–4 words in a dark rounded pill at y≈1400, current word in icon orange); then a 4 s end card ("Works offline. Always free." / "No signal. No account. No ads." / App Store badge / glamisguide.app) with a 0.4 s fade. The old title card (dune photo, icon + "Glamis Guide" lockup, orange rule, `feature:` large, `story_headline` under it) is now `out/reel-cover.png`, used only as the Reel cover image. Never post the raw `video.*`. Do not change the layout without Andy's sign-off.
+- Story/Reel video: approved 2026-11-12. Replaces the 2026-11-01 full-bleed hand-camera layout. Andy now supplies a screen recording (`video.*`) and a separate voiceover (`voiceover.*`) that start at the same moment. `tools/render_reel.py` builds the reel: the video opens directly on the demo, with no title screen and no headline overlay (both read as an ad and lost viewers); the recording plays inside a drawn device frame (iPhone, iPad or Watch, see Device frame) centred between y≈170 and y≈1380 over the blurred, darkened dune photo; spoken captions from the voiceover (2–4 words in a dark rounded pill at y≈1466, in the band under the device, current word in icon orange); the voiceover is the only sound; then a 3.5 s end card (icon, "Glamis Guide", the day's `end_title`, "Works offline. Always free.", App Store badge, glamisguide.app) with a 0.4 s fade. The demo ends 0.8 s after the last spoken word, which drops the tail of the recording (Control Center); if the voiceover outlasts the recording, the last frame holds. The title card (dune photo, icon + "Glamis Guide" lockup, orange rule, `feature:` large, `story_headline` under it) is `out/reel-cover.png`, used only as the Reel cover image. Never post the raw `video.*`. Do not change the layout without Andy's sign-off.
 
 - Download Story: approved 2026-10-10 (`2026-10-11/out/story-download.png` is the reference). Icon and app name grouped tight, the whole stack pinned to the bottom with 200 px of padding. Do not change the layout in `render.py` without Andy's sign-off.
 
