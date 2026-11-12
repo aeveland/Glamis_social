@@ -5,6 +5,7 @@ what it does:
 key facts:
 angle:
 headline:
+end title:
 device:
 notes:
 
@@ -19,6 +20,7 @@ notes:
 # key facts    Real facts only. Used word for word. Blank is fine.
 # angle        Optional. Who it is for or why it matters.
 # headline     Optional. Blank = Claude drafts one.
-# device       Optional: iphone, ipad or watch. Blank = picked from screenshot.
+# end title    Optional. Closing title on the video's end card. Blank = Claude drafts one.
+# device       Optional: iphone, ipad or watch. Blank = picked from the screenshot and the recording.
 # notes        Optional. Anything else for this day.
 # ─────────────────────────────────────────────────────────────

@@ -46,10 +46,12 @@ def missing_for(day):
     """List what is still needed for a day. Empty list = ready."""
     folder = ROOT / day.isoformat()
     if not folder.is_dir():
-        return ["folder (run New Day)", "video", "screenshot", "directions.md"]
+        return ["folder (run New Day)", "video", "voiceover", "screenshot", "directions.md"]
     need = []
     if not any(folder.glob("video.*")):
         need.append("video")
+    if not any(folder.glob("voiceover.*")):
+        need.append("voiceover")
     if not any(folder.glob("screenshot.*")):
         need.append("screenshot")
     d = folder / "directions.md"
@@ -114,7 +116,7 @@ def add_day(day):
     still = f"\nStill needed: {', '.join(need)}." if need else "\nFolder is ready."
     add_reminder(
         f"Glamis: create content for {label}",
-        f"Posts: {describe(day)}.\nAdd video, screenshot, directions.md. Set status: ready and save by 7:30 PM.{still}",
+        f"Posts: {describe(day)}.\nAdd video, voiceover, screenshot, directions.md. Set status: ready and save by 7:30 PM.{still}",
         dt.datetime.combine(eve, dt.time(18, 30)),
     )
     add_reminder(
