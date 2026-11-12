@@ -194,12 +194,10 @@ def render_story(copy, out):
     y += badge.height + GAP_BADGE_URL
 
     uf = font("Inter-Medium.otf", 42)
-    url = "glamisguide.app"
-    off, h = ink(uf, url)
-    text_block(c, [url], uf, 540, y - off, 50, shadow=0.55)
-    w = d.textlength(url, font=uf)
+    how = 'Link in bio, or search "Glamis Guide"'   # the Story carries no link sticker
+    off, h = ink(uf, how)
+    text_block(c, [how], uf, 540, y - off, 50, shadow=0.55)
     uy = y + h + 8
-    d.line([(540 - w / 2, uy), (540 + w / 2, uy)], fill=WHITE, width=3)
     # Pin the stack: its last line sits BOTTOM_PAD above the bottom edge.
     BOTTOM_PAD = 200             # bottom padding; Instagram reply bar covers roughly the last 150-200 px
     shift = STORY[1] - BOTTOM_PAD - uy

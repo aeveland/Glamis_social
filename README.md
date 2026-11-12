@@ -11,16 +11,16 @@ Andy records a short screen recording, a voiceover and a screenshot each evening
 | By 7:30 PM, the evening before | Andy | Adds `video`, `voiceover`, `screenshot.png` and `directions.md` (`status: ready`) to a new day folder and publishes it |
 | 7:45 PM | Claude (scheduled task "Glamis nightly build") | Writes `copy.json`, renders `out/`, commits, creates the Metricool items, sends a report |
 | After the report | Andy | Checks the items in Metricool and schedules them |
-| 9:58 AM | Claude (scheduled task "Glamis sticker reminder") | Phone reminder with the `ig_story` link |
-| 10:00 / 10:01 AM | Andy | Posts both Stories by hand in Instagram (files from the build report) with the link sticker |
+| 9:58 AM | Claude (scheduled task "Glamis Story reminder") | Phone reminder with the two Story files |
+| 10:00 / 10:01 AM | Andy | Posts both Stories by hand in Instagram (files from the build report). No sticker |
 | 12:00 PM, 5:00 PM | Metricool | Reels and feed posts publish on their own |
 
 ## What gets posted
 
 | Time (PT) | Item | Asset | Publishing |
 |---|---|---|---|
-| 10:00 AM | Instagram Story 1 | Feature video (`out/reel.mp4`: framed screen recording, voiceover, captions, end card) | By hand in Instagram (not in Metricool). Andy adds the link sticker |
-| 10:01 AM | Instagram Story 2 | `out/story-download.png` | By hand in Instagram (not in Metricool). Andy adds the link sticker |
+| 10:00 AM | Instagram Story 1 | Feature video (`out/reel.mp4`: framed screen recording, voiceover, captions, end card) | By hand in Instagram (not in Metricool). No sticker: the end card says how to get the app |
+| 10:01 AM | Instagram Story 2 | `out/story-download.png` | By hand in Instagram (not in Metricool). No sticker: the image says "Link in bio, or search" |
 | 12:00 PM | Instagram Reel + Facebook Reel | `out/reel.mp4` + captions | Auto |
 | 5:00 PM | Instagram feed post + Facebook post | `out/post.png` + captions | Auto. Tue, Thu, Sat, plus every day in holiday ramp-up windows |
 
@@ -116,7 +116,7 @@ Every App Store link carries an App Store Connect campaign so downloads can be t
 
 | Campaign | Used in |
 |---|---|
-| `ig_story` | Link sticker on both Instagram Stories |
+| `ig_story` | Retired 2026-11-12 (was the Story link sticker) |
 | `ig_bio` | Instagram profile link |
 | `glamisguide_fb` | Facebook captions |
 
