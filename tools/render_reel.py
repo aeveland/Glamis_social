@@ -262,7 +262,7 @@ def render_title(feature, headline, out):
 
 
 def render_end(title, out):
-    """Closing title for this video, then offline + free, App Store badge, site."""
+    """Closing title for this video, then offline + free, App Store badge, how to get the app."""
     c = dune_background(160)
     stack = Image.new("RGBA", STORY, (0, 0, 0, 0))
     d = ImageDraw.Draw(stack)
@@ -302,9 +302,9 @@ def render_end(title, out):
     y += badge.height + 44
 
     uf = font("Inter-Medium.otf", 42)
-    url = "glamisguide.app"
-    off, h = ink(d, uf, url)
-    text_block(stack, [url], uf, 540, y - off, 50, shadow=0.55)
+    how = 'Search "Glamis Guide" on the App Store'
+    off, h = ink(d, uf, how)
+    text_block(stack, [how], uf, 540, y - off, 50, shadow=0.55)
     bottom = y + h
 
     # Centre the stack between the top and bottom safe zones (Reels UI is tall at the bottom).

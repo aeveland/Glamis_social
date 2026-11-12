@@ -10,8 +10,8 @@ Evening before each posting day: Andy has the screen recording, voiceover, scree
 
 | Time (PT) | Type | Asset | Publishing | Days |
 |---|---|---|---|---|
-| 10:00 AM | Story 1 | `<day>/out/reel.mp4` (framed screen recording with voiceover, captions + end card) | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
-| 10:01 AM | Story 2 | `<day>/out/story-download.png` | **Not in Metricool.** Andy posts it by hand in Instagram with the `ig_story` link sticker (9:58 reminder) | Every day |
+| 10:00 AM | Story 1 | `<day>/out/reel.mp4` (framed screen recording with voiceover, captions + end card) | **Not in Metricool.** Andy posts it by hand in Instagram, no sticker (9:58 reminder) | Every day |
+| 10:01 AM | Story 2 | `<day>/out/story-download.png` | **Not in Metricool.** Andy posts it by hand in Instagram, no sticker (9:58 reminder) | Every day |
 | 12:00 PM | Reel | Same `<day>/out/reel.mp4` + `reel_caption` | Auto-publish | Every day |
 | 5:00 PM | Feed post | `<day>/out/post.png` + `caption` | Auto-publish | **Tue, Thu, Sat only**, plus every day in a ramp-up window |
 | 12:00 PM | Facebook Reel | Same `<day>/out/reel.mp4` + `fb_reel_caption` | Auto-publish | Every day |
@@ -87,9 +87,9 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 
 ## Approved layouts
 
-- Story/Reel video: approved 2026-11-12. Replaces the 2026-11-01 full-bleed hand-camera layout. Andy now supplies a screen recording (`video.*`) and a separate voiceover (`voiceover.*`) that start at the same moment. `tools/render_reel.py` builds the reel: the video opens directly on the demo, with no title screen and no headline overlay (both read as an ad and lost viewers); the recording plays inside a drawn device frame (iPhone, iPad or Watch, see Device frame) centred between y≈170 and y≈1380 over the blurred, darkened dune photo; spoken captions from the voiceover (2–4 words in a dark rounded pill at y≈1466, in the band under the device, current word in icon orange); the voiceover is the only sound; then a 3.5 s end card (icon, "Glamis Guide", the day's `end_title`, "Works offline. Always free.", App Store badge, glamisguide.app) with a 0.4 s fade. The demo ends 0.8 s after the last spoken word, which drops the tail of the recording (Control Center); if the voiceover outlasts the recording, the last frame holds. The title card (dune photo, icon + "Glamis Guide" lockup, orange rule, `feature:` large, `story_headline` under it) is `out/reel-cover.png`, used only as the Reel cover image. Never post the raw `video.*`. Do not change the layout without Andy's sign-off.
+- Story/Reel video: approved 2026-11-12. Replaces the 2026-11-01 full-bleed hand-camera layout. Andy now supplies a screen recording (`video.*`) and a separate voiceover (`voiceover.*`) that start at the same moment. `tools/render_reel.py` builds the reel: the video opens directly on the demo, with no title screen and no headline overlay (both read as an ad and lost viewers); the recording plays inside a drawn device frame (iPhone, iPad or Watch, see Device frame) centred between y≈170 and y≈1380 over the blurred, darkened dune photo; spoken captions from the voiceover (2–4 words in a dark rounded pill at y≈1466, in the band under the device, current word in icon orange); the voiceover is the only sound; then a 3.5 s end card (icon, "Glamis Guide", the day's `end_title`, "Works offline. Always free.", App Store badge, `Search "Glamis Guide" on the App Store`) with a 0.4 s fade. The demo ends 0.8 s after the last spoken word, which drops the tail of the recording (Control Center); if the voiceover outlasts the recording, the last frame holds. The title card (dune photo, icon + "Glamis Guide" lockup, orange rule, `feature:` large, `story_headline` under it) is `out/reel-cover.png`, used only as the Reel cover image. Never post the raw `video.*`. Do not change the layout without Andy's sign-off.
 
-- Download Story: approved 2026-10-10 (`2026-10-11/out/story-download.png` is the reference). Icon and app name grouped tight, the whole stack pinned to the bottom with 200 px of padding. Do not change the layout in `render.py` without Andy's sign-off.
+- Download Story: approved 2026-10-10 (`2026-10-11/out/story-download.png` is the reference). Changed 2026-11-12: the last line under the badge reads `Link in bio, or search "Glamis Guide"` instead of the underlined glamisguide.app, because the Story no longer carries a link sticker. Icon and app name grouped tight, the whole stack pinned to the bottom with 200 px of padding. Do not change the layout in `render.py` without Andy's sign-off.
 
 ## Instagram specs
 
@@ -100,11 +100,10 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 
 - Brand: Glamis Guide, `blogId` **7334820**, Instagram `glamisguide`, timezone America/Los_Angeles.
 - Create each piece with `createScheduledPostForReview` (reviewers: `aeveland@me.com`, approvalSystem `any`). If that tool errors because the plan has no team review, fall back to `createScheduledPost` with `"draft": true`, and tell Andy the drafts need scheduling in Metricool.
-- **Stories are not created in Metricool** (changed 2026-10-13). The Instagram API cannot add link stickers, and Metricool's notification flow didn't reliably hand off to Instagram, so Andy posts both Stories directly in the Instagram app. Never create Story items in Metricool.
-- **The link sticker is required on both Stories.** A daily "Glamis sticker reminder" scheduled task pings Andy at 9:58 AM with the link and steps. Every build report sends both Story files (`out/reel.mp4` and `story-download.png`) with SendUserFile, gives their commit-hash raw URLs so Andy can save them on his phone, and lists the Story step first:
+- **Stories are not created in Metricool** (changed 2026-10-13). Metricool's notification flow didn't reliably hand off to Instagram, so Andy posts both Stories directly in the Instagram app. Never create Story items in Metricool.
+- **No link sticker on Stories** (changed 2026-11-12; the sticker step was confusing). The Stories themselves say how to get the app: the video's end card reads `Search "Glamis Guide" on the App Store` and the download Story reads `Link in bio, or search "Glamis Guide"`. Never ask Andy to add a sticker. A daily "Glamis Story reminder" scheduled task pings Andy at 9:58 AM with the two files. Every build report sends both Story files (`out/reel.mp4` and `story-download.png`) with SendUserFile, gives their commit-hash raw URLs so Andy can save them on his phone, and lists the Story step first:
   1. Save `reel.mp4` and `story-download.png` to Photos (from the file cards or the raw links).
-  2. In Instagram as @glamisguide: **+** → **Story** → pick the video. Sticker icon → **Link** → paste the `ig_story` link → Customize sticker text: **Get Glamis Guide**.
-  3. Place it in the lower third, clear of the phone screen, and share. Repeat for the image at 10:01, sticker over the App Store badge.
+  2. In Instagram as @glamisguide: **+** → **Story** → pick the video → share. Repeat for the image at 10:01.
 - Cover image: every video item (Instagram Reel, Facebook Reel, TikTok, YouTube Short) sets `videoThumbnailUrl` to the commit-hash URL of `out/reel-cover.png`. If a network rejects it with `VIDEO_THUMBNAIL_NOT_APPLICABLE`, retry that item without the field and say so in the report.
 - Reel: `instagramData.type: "REEL"`, `showReelOnFeed: true`, media = `out/reel.mp4` URL, `reel_caption` as `text`, 12:00, `autoPublish: true`.
 - Post (feed days only): `instagramData.type: "POST"`, media = post.png URL, `caption` as `text`, 17:00, `autoPublish: true`.
@@ -128,7 +127,7 @@ If `headline:` is filled in `directions.md`, use it verbatim as `story_headline`
 
 ## Campaign links (App Store Connect)
 
-- `ig_story`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_story&mt=8
+- `ig_story`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=ig_story&mt=8 (retired 2026-11-12 with the Story link sticker; kept for reference)
 - `glamisguide_fb`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_fb&mt=8 (Facebook captions)
 - `glamisguide_tt`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=glamisguide_tt&mt=8 (reserved for the TikTok bio link once the account switches to Business; not in use yet, never in captions)
 - `youTube`: https://apps.apple.com/app/apple-store/id6797360883?pt=118293478&ct=youTube&mt=8 (YouTube Short descriptions and the channel's Links section)
